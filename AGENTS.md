@@ -56,8 +56,10 @@ silent change.
   `sound.ts`, `scorebook.ts`, `game-slot.ts`), `palette.ts`, `styles.css`
 - `art/manifest.json` — the art recipes; `public/art/` — the committed PNGs;
   regenerate with `node scripts/generate-art.mjs` (needs `FAL_KEY`)
-- `art/music.json` — the hall track's recipe; `public/music/hall.mp3`;
-  regenerate with `node scripts/generate-music.mjs`, then re-check its
-  outro and `loopEnd` in `src/core/music.ts` (ADR-0015)
+- `art/music.json` — the tracks' recipes; `public/music/hall.mp3` and
+  `public/music/mars-patrol.mp3`; regenerate with
+  `node scripts/generate-music.mjs [id]`, then re-check the outro and
+  `loopEnd` (`src/core/music.ts`, `src/games/mars-patrol/core/music.ts`;
+  ADR-0015, ADR-0021)
 - `scripts/` — the gate scripts and the art pipeline
 - `migrations/` — D1 schema; `docs/adr/` — the decisions

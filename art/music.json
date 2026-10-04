@@ -4,6 +4,10 @@
     {
       "id": "hall",
       "prompt": "Instrumental 8-bit chiptune for a cosy late-night retro arcade: NES and Game Boy style square-wave lead, triangle-wave bass, noise-channel drums, warm, playful and a little dreamy, 110 BPM, steady groove that loops seamlessly with no intro, no fade-out and no ending. No vocals, no lyrics. About two minutes long."
+    },
+    {
+      "id": "mars-patrol",
+      "prompt": "Instrumental modern synthwave for a high-speed arcade racer on Mars: driving pulsing analog bass line, punchy electronic drums, shimmering polished synth leads and lush pads, glossy contemporary production, energetic and adventurous with a hint of retro, 130 BPM, steady groove that loops seamlessly with no intro, no fade-out and no ending. No vocals, no lyrics. About two minutes long."
     }
   ]
 }

@@ -11,6 +11,7 @@ import { SECTION } from './core/course';
 import { TITLE } from './core/flow';
 import { bestAfter, hud, updateNotice } from './core/hud';
 import type { Notice } from './core/hud';
+import { musicLevel } from './core/music';
 import { soundsFor } from './core/sfx';
 import { createSynth } from './render/synth';
 import { createView } from './render/view';
@@ -54,6 +55,7 @@ export default function createGame(): Game {
         best = bestAfter(best, posted);
         notice = updateNotice(notice, out.events, dt);
         synth?.play(soundsFor(out.events));
+        synth?.music(musicLevel(screen));
         view.draw(screen, out.events, hud(SECTION, screen, best), notice, dt);
         frame = requestAnimationFrame(loop);
       };

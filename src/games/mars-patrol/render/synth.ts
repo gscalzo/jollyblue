@@ -1,15 +1,21 @@
 /**
- * Plays the core's sound recipes (ADR-0017) through the hall's game bus
- * (ADR-0020): oscillators and filtered noise, each with a short envelope.
+ * Plays the core's sound recipes (ADR-0017) and the game's track (ADR-0021)
+ * through the hall's game bus (ADR-0020): oscillators and filtered noise,
+ * each with a short envelope, over the looping music.
  */
 import type { GameAudio } from '../../../core/game';
+import { createLoopPlayer } from '../../../loop-player';
+import { MARS_TRACK } from '../core/music';
 import { SFX } from '../core/sfx';
 import type { SfxName, Tone } from '../core/sfx';
 
 const VOLUME = 0.8;
+const MUSIC_VOLUME = 0.32;
 
 export interface Synth {
   play(names: readonly SfxName[]): void;
+  /** Keeps the music looping at `level` (0 to 1) of its volume. */
+  music(level: number): void;
   dispose(): void;
 }
 
@@ -67,12 +73,22 @@ export function createSynth(audio: GameAudio): Synth {
   out.gain.value = VOLUME;
   out.connect(audio.out);
   const buffer = noise(ctx);
+  const music = ctx.createGain();
+  music.gain.value = 0;
+  music.connect(audio.out);
+  const player = createLoopPlayer(ctx, music, MARS_TRACK);
   return {
     play(names) {
       for (const name of names) for (const tone of SFX[name]) playTone(ctx, out, tone, buffer);
     },
+    music(level) {
+      music.gain.setTargetAtTime(MUSIC_VOLUME * level, ctx.currentTime, 0.4);
+      player.update();
+    },
     dispose() {
+      player.stop();
       out.disconnect();
+      music.disconnect();
     },
   };
 }
