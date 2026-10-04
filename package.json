@@ -1,0 +1,55 @@
+{
+  "name": "jollyblue",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A private 8-bit arcade hall in an isometric 3D world",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "check": "tsc -p tsconfig.app.json --noEmit && tsc -p tsconfig.worker.json --noEmit",
+    "typecheck": "npm run check",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "design": "node scripts/design-check.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "crap": "node scripts/crap.mjs",
+    "halstead": "node scripts/halstead.mjs",
+    "dup": "jscpd src shared worker --ignore '**/*.test.*' --min-tokens 50 --threshold 0 --silent",
+    "deadcode": "knip --no-config-hints",
+    "mutation": "stryker run",
+    "gate": "npm run check && npm run lint && npm run format:check && npm run design && npm run coverage && npm run crap && npm run halstead && npm run dup && npm run deadcode",
+    "deploy": "npm run build && wrangler deploy",
+    "db:migrate:local": "wrangler d1 migrations apply jollyblue --local",
+    "db:migrate:remote": "wrangler d1 migrations apply jollyblue --remote"
+  },
+  "dependencies": {
+    "hono": "^4.13.13"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.62.5",
+    "@cloudflare/workers-types": "^5.20261004.1",
+    "@eslint/js": "^9.39.5",
+    "@stryker-mutator/core": "^10.0.0",
+    "@stryker-mutator/vitest-runner": "^10.0.0",
+    "@vitest/coverage-v8": "^4.1.11",
+    "eslint": "^9.39.5",
+    "eslint-plugin-sonarjs": "^4.2.2",
+    "globals": "^17.13.0",
+    "jscpd": "^5.4.0",
+    "knip": "^6.39.0",
+    "prettier": "^3.9.9",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.71.0",
+    "vite": "^8.3.2",
+    "vitest": "^4.1.11",
+    "wrangler": "^4.147.0"
+  },
+  "allowScripts": {
+    "workerd@1.20261001.1": true,
+    "esbuild@0.28.1": true
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/main.ts", "worker/index.ts", "scripts/*.mjs"],
+  "project": ["src/**/*.ts", "shared/**/*.ts", "worker/**/*.ts", "scripts/**/*.mjs"],
+  "ignoreDependencies": ["@stryker-mutator/vitest-runner"]
+}
