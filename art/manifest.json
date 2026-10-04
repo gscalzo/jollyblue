@@ -1,0 +1,198 @@
+{
+  "model": "fal-ai/flux/dev",
+  "style": "pixel art, 16-bit video game style, crisp limited palette, flat shading, no blur, no photo",
+  "items": [
+    {
+      "id": "marquee-moon-patrol",
+      "prompt": "arcade cabinet marquee banner, the game title \"MOON PATROL 3D\", with the big \"3D\" clearly part of the logo in big bold chunky retro 80s arcade logo lettering, small illustration of a six-wheeled moon buggy jumping over a crater under a huge earth, deep blue night beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 500
+    },
+    {
+      "id": "side-moon-patrol",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a six-wheeled moon buggy jumping over a crater under a huge earth, deep blue night, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 200
+    },
+    {
+      "id": "marquee-lava-llama",
+      "prompt": "arcade cabinet marquee banner, the game title \"LAVA LLAMA\" in big bold chunky retro 80s arcade logo lettering, small illustration of a cheerful llama surfing on a river of orange lava, volcano behind beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 101
+    },
+    {
+      "id": "side-lava-llama",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a cheerful llama surfing on a river of orange lava, volcano behind, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 201
+    },
+    {
+      "id": "marquee-turbo-nonna",
+      "prompt": "arcade cabinet marquee banner, the game title \"TURBO NONNA\" in big bold chunky retro 80s arcade logo lettering, small illustration of an Italian grandma racing a rocket-powered scooter, speed lines, red beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 102
+    },
+    {
+      "id": "side-turbo-nonna",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of an Italian grandma racing a rocket-powered scooter, speed lines, red, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 202
+    },
+    {
+      "id": "marquee-star-gardener",
+      "prompt": "arcade cabinet marquee banner, the game title \"STAR GARDENER\" in big bold chunky retro 80s arcade logo lettering, small illustration of a little astronaut watering glowing star flowers on a green planet beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 103
+    },
+    {
+      "id": "side-star-gardener",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a little astronaut watering glowing star flowers on a green planet, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 203
+    },
+    {
+      "id": "marquee-pixel-piranha",
+      "prompt": "arcade cabinet marquee banner, the game title \"PIXEL PIRANHA\" in big bold chunky retro 80s arcade logo lettering, small illustration of a grinning teal piranha chasing bubbles in a dark sea beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 104
+    },
+    {
+      "id": "side-pixel-piranha",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a grinning teal piranha chasing bubbles in a dark sea, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 204
+    },
+    {
+      "id": "marquee-galaxy-gelato",
+      "prompt": "arcade cabinet marquee banner, the game title \"GALAXY GELATO\" in big bold chunky retro 80s arcade logo lettering, small illustration of a towering pink ice-cream cone with planets for scoops beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 105
+    },
+    {
+      "id": "side-galaxy-gelato",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a towering pink ice-cream cone with planets for scoops, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 205
+    },
+    {
+      "id": "marquee-robo-rodeo",
+      "prompt": "arcade cabinet marquee banner, the game title \"ROBO RODEO\" in big bold chunky retro 80s arcade logo lettering, small illustration of a cowboy riding a bucking blue robot bull in a desert beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 106
+    },
+    {
+      "id": "side-robo-rodeo",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a cowboy riding a bucking blue robot bull in a desert, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 206
+    },
+    {
+      "id": "marquee-comet-kebab",
+      "prompt": "arcade cabinet marquee banner, the game title \"COMET KEBAB\" spelled exactly C-O-M-E-T K-E-B-A-B in big bold chunky retro 80s arcade logo lettering, small illustration of comets skewered like a kebab, purple space, sparks beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 517
+    },
+    {
+      "id": "side-comet-kebab",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of comets skewered like a kebab, purple space, sparks, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 207
+    },
+    {
+      "id": "marquee-disco-dungeon",
+      "prompt": "arcade cabinet marquee banner, the game title \"DISCO DUNGEON\" in big bold chunky retro 80s arcade logo lettering, small illustration of skeletons dancing under a disco ball in a stone dungeon, pink lights beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 108
+    },
+    {
+      "id": "side-disco-dungeon",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of skeletons dancing under a disco ball in a stone dungeon, pink lights, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 208
+    },
+    {
+      "id": "marquee-yeti-yacht",
+      "prompt": "arcade cabinet marquee banner, the game title \"YETI YACHT\" in big bold chunky retro 80s arcade logo lettering, small illustration of a friendly yeti sailing a small yacht between icebergs, teal sea beside the title, glowing, black background, wide banner",
+      "generate": [1024, 256],
+      "size": [128, 32],
+      "colours": 24,
+      "seed": 109
+    },
+    {
+      "id": "side-yeti-yacht",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a friendly yeti sailing a small yacht between icebergs, teal sea, bold shapes, strong outlines, vivid colours, no text",
+      "generate": [512, 1024],
+      "size": [48, 96],
+      "colours": 20,
+      "seed": 209
+    },
+    {
+      "id": "carpet",
+      "prompt": "seamless tileable 1990s arcade carpet pattern, scattered neon shapes, squiggles, triangles, planets and stars in pink, cyan, yellow on a dark purple background, flat top-down",
+      "generate": [768, 768],
+      "size": [48, 48],
+      "colours": 12,
+      "seed": 300
+    },
+    {
+      "id": "poster-high-score",
+      "prompt": "a retro poster that says \"HIGH SCORE\", a trophy with neon rays, 1980s arcade poster, bold flat colours, thick border",
+      "generate": [768, 1024],
+      "size": [48, 64],
+      "colours": 20,
+      "seed": 400
+    },
+    {
+      "id": "poster-insert-coin",
+      "prompt": "a retro poster that says \"INSERT COIN\", a giant golden coin with sparkles, 1980s arcade poster, bold flat colours, thick border",
+      "generate": [768, 1024],
+      "size": [48, 64],
+      "colours": 20,
+      "seed": 401
+    },
+    {
+      "id": "poster-game-over",
+      "prompt": "a retro poster that says \"GAME OVER\", a pixel spaceship exploding into stars, 1980s arcade poster, bold flat colours, thick border",
+      "generate": [768, 1024],
+      "size": [48, 64],
+      "colours": 20,
+      "seed": 402
+    }
+  ]
+}

@@ -32,6 +32,11 @@ export function toonTextured(map: THREE.Texture): THREE.MeshToonMaterial {
   return new THREE.MeshToonMaterial({ map, gradientMap: gradient });
 }
 
+/** An unshared toon material, for a surface that will be dressed with art. */
+export function toonPanel(color: number): THREE.MeshToonMaterial {
+  return new THREE.MeshToonMaterial({ color, gradientMap: gradient });
+}
+
 /** Something that glows on its own: neon tubes, screens, marquees. */
 export function glow(color: number): THREE.MeshBasicMaterial {
   return new THREE.MeshBasicMaterial({ color });

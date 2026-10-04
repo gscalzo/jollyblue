@@ -6,7 +6,8 @@
 import * as THREE from 'three';
 import type { Hall } from '../core/hall';
 import { INK, SCENE, TYPE } from '../palette';
-import { glow, pixelCanvas, toon, toonTextured } from './materials';
+import { dressWith, loadArt } from './art';
+import { glow, pixelCanvas, toon, toonPanel, toonTextured } from './materials';
 
 const WALL_HEIGHT = 3.2;
 const WALL_THICKNESS = 0.2;
@@ -34,6 +35,14 @@ function carpetTexture(hall: Hall): THREE.CanvasTexture {
 
 function floor(hall: Hall): THREE.Mesh {
   const material = toonTextured(carpetTexture(hall));
+  loadArt('carpet', (art) => {
+    art.wrapS = THREE.RepeatWrapping;
+    art.wrapT = THREE.RepeatWrapping;
+    art.repeat.set(hall.width / 4, hall.depth / 4);
+    material.map = art;
+    material.color.set(SCENE.carpetTint);
+    material.needsUpdate = true;
+  });
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(hall.width, hall.depth), material);
   mesh.rotation.x = -Math.PI / 2;
   mesh.position.set(hall.width / 2, 0, hall.depth / 2);
@@ -112,9 +121,29 @@ function lights(hall: Hall): THREE.Group {
   return group;
 }
 
+/** Posters on the back walls: [art id, x, z, facing east (on the west wall)]. */
+const POSTERS: [string, number, number, boolean][] = [
+  ['poster-high-score', 1.4, 0.02, false],
+  ['poster-insert-coin', 0.02, 2.1, true],
+  ['poster-game-over', 0.02, 10, true],
+];
+
+function posters(): THREE.Group {
+  const group = new THREE.Group();
+  for (const [id, x, z, onWest] of POSTERS) {
+    const material = toonPanel(SCENE.wallTrim);
+    dressWith(material, id);
+    const poster = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 1.2), material);
+    poster.position.set(x, 1.7, z);
+    if (onWest) poster.rotation.y = Math.PI / 2;
+    group.add(poster);
+  }
+  return group;
+}
+
 /** Everything that does not move: the room and its lights. */
 export function buildRoom(hall: Hall): THREE.Group {
   const room = new THREE.Group();
-  room.add(floor(hall), walls(hall), neonTubes(hall), sign(hall), lights(hall));
+  room.add(floor(hall), walls(hall), neonTubes(hall), sign(hall), posters(), lights(hall));
   return room;
 }

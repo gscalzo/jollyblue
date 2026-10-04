@@ -5,6 +5,7 @@
  */
 import type { Livery } from '../palette';
 import { isGameId } from '../../shared/scores';
+import { parseJingle } from './audio';
 import { add, facingVector, footprint, rectContains, rectsOverlap, scale } from './geometry';
 import type { Facing, Rect, Vec2 } from './geometry';
 
@@ -64,6 +65,7 @@ function cabinetErrors(hall: Hall, cabinet: Cabinet, index: number): string[] {
   if (!rectContains(room, pointRect(usePoint(cabinet)))) {
     errors.push(`${cabinet.id} faces a wall`);
   }
+  if (parseJingle(cabinet.jingle) === null) errors.push(`${cabinet.id} has a bad jingle`);
   if (cabinet.game !== undefined && !isGameId(cabinet.game)) {
     errors.push(`${cabinet.id} names a bad game id`);
   }

@@ -7,6 +7,7 @@ export interface Overlay {
   setPrompt(text: string | null): void;
   setVeil(opacity: number): void;
   showGame(on: boolean): void;
+  setMuted(muted: boolean): void;
 }
 
 function layer(host: HTMLElement, tag: string, className: string): HTMLElement {
@@ -20,6 +21,8 @@ export function createOverlay(host: HTMLElement): Overlay {
   const veil = layer(host, 'div', 'veil');
   const gameCanvas = layer(host, 'canvas', 'game') as HTMLCanvasElement;
   const prompt = layer(host, 'div', 'prompt');
+  const soundOff = layer(host, 'div', 'sound-off');
+  soundOff.textContent = 'SOUND OFF — M';
   let shownPrompt: string | null = null;
   return {
     gameCanvas,
@@ -34,6 +37,9 @@ export function createOverlay(host: HTMLElement): Overlay {
     },
     showGame(on) {
       gameCanvas.classList.toggle('on', on);
+    },
+    setMuted(muted) {
+      soundOff.classList.toggle('on', muted);
     },
   };
 }

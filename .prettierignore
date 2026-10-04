@@ -5,3 +5,4 @@ reports
 .wrangler
 .stryker-tmp
 package-lock.json
+art/raw

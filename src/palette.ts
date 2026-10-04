@@ -22,6 +22,10 @@ export const SCENE = {
   hoodieDark: 0x2a76b0,
   trousers: 0x2b2440,
   shoes: 0xf4e9d8,
+  /** White: shows a texture's own colours. */
+  untinted: 0xffffff,
+  /** Darkens the carpet art so the cabinets stay the brightest things in the room. */
+  carpetTint: 0x8a7fa8,
 } as const;
 
 /** The cabinet liveries, one per cabinet colour scheme. */

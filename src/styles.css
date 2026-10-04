@@ -81,3 +81,17 @@ body {
 .prompt.on {
   opacity: 1;
 }
+
+.sound-off {
+  position: absolute;
+  top: 1.5vh;
+  right: 2vw;
+  color: var(--ink);
+  letter-spacing: 0.15em;
+  font-size: 0.75rem;
+  display: none;
+}
+
+.sound-off.on {
+  display: block;
+}

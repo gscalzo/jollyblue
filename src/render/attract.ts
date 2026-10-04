@@ -3,10 +3,11 @@
  * plays, painted into a tiny canvas that the screen wears as a texture.
  */
 import type { AttractStyle } from '../core/hall';
+import { GLYPH_H, pixelsOf } from '../core/pixelfont';
 import { INK } from '../palette';
 
-export const SCREEN_W = 48;
-export const SCREEN_H = 36;
+export const SCREEN_W = 64;
+export const SCREEN_H = 48;
 
 type Painter = (ctx: CanvasRenderingContext2D, t: number) => void;
 
@@ -93,4 +94,14 @@ export function paintAttract(ctx: CanvasRenderingContext2D, style: AttractStyle,
   ctx.fillStyle = INK.screenBlack;
   ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
   PAINTERS[style](ctx, t);
+}
+
+/** Paints the high-score table in the 3×5 font, the heading in pink. */
+export function paintTable(ctx: CanvasRenderingContext2D, lines: readonly string[]): void {
+  ctx.fillStyle = INK.screenBlack;
+  ctx.fillRect(0, 0, SCREEN_W, SCREEN_H);
+  lines.forEach((line, row) => {
+    ctx.fillStyle = row === 0 ? INK.pink : INK.phosphor;
+    for (const p of pixelsOf(line)) ctx.fillRect(2 + p.x, 3 + row * (GLYPH_H + 2) + p.y, 1, 1);
+  });
 }

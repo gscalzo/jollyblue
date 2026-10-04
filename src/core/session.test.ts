@@ -155,6 +155,8 @@ describe('handover', () => {
 describe('prompt', () => {
   it('invites play at a game, names a dud, and says OUT OF ORDER', () => {
     expect(prompt(IN_HALL, moon)).toBe('PLAY MOON PATROL 3D — E / A');
+    expect(prompt(IN_HALL, moon, 'HI 900 GIO')).toBe('PLAY MOON PATROL 3D — HI 900 GIO — E / A');
+    expect(prompt(IN_HALL, dud, 'HI 900 GIO')).toBe(`${dud.title} — E / A`);
     expect(prompt(IN_HALL, dud)).toBe(`${dud.title} — E / A`);
     expect(prompt({ kind: 'notice', cabinet: dud, left: 1 }, null)).toBe(
       `${dud.title} — OUT OF ORDER`,

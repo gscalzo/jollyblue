@@ -8,14 +8,19 @@ import { facingYaw } from '../core/geometry';
 import { CABINET_DEPTH, CABINET_WIDTH } from '../core/hall';
 import type { Cabinet } from '../core/hall';
 import { INK, LIVERIES, SCENE, TYPE } from '../palette';
-import { paintAttract, SCREEN_H, SCREEN_W } from './attract';
-import { glow, pixelCanvas, toon } from './materials';
+import { tableLines, showsTable } from '../core/scoreboard';
+import type { ScoreEntry } from '../../shared/types';
+import { paintAttract, paintTable, SCREEN_H, SCREEN_W } from './attract';
+import { dressWith } from './art';
+import { glow, pixelCanvas, toon, toonPanel } from './materials';
 
 export interface CabinetView {
   cabinet: Cabinet;
   group: THREE.Group;
   /** Repaints the screen's attract loop. */
   tick(t: number): void;
+  /** The game's high scores, cycled through in attract mode. */
+  setScores(scores: readonly ScoreEntry[]): void;
   /** Lights the cabinet up when the avatar can play it. */
   setHighlighted(on: boolean): void;
   /** Where the camera dives to when the cabinet's game starts. */
@@ -32,7 +37,8 @@ function part(
   return mesh;
 }
 
-function marquee(title: string): THREE.Mesh {
+function marquee(cabinet: Cabinet): THREE.Mesh {
+  const title = cabinet.title;
   const { ctx, texture } = pixelCanvas(96, 24);
   ctx.fillStyle = INK.screenBlack;
   ctx.fillRect(0, 0, 96, 24);
@@ -41,12 +47,26 @@ function marquee(title: string): THREE.Mesh {
   ctx.textBaseline = 'middle';
   ctx.fillStyle = INK.marqueeGlow;
   ctx.fillText(title, 48, 13, 92);
-  const mesh = new THREE.Mesh(
-    new THREE.PlaneGeometry(CABINET_WIDTH * 0.96, 0.26),
-    new THREE.MeshBasicMaterial({ map: texture }),
-  );
+  const material = new THREE.MeshBasicMaterial({ map: texture });
+  dressWith(material, `marquee-${cabinet.id}`);
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(CABINET_WIDTH * 0.96, 0.26), material);
   mesh.position.set(0, 2.08, 0.26);
   return mesh;
+}
+
+/** The painted side panels, one each side, over the livery. */
+function sideArt(cabinet: Cabinet): THREE.Group {
+  const group = new THREE.Group();
+  // Livery-coloured until the art arrives, then the art untinted.
+  const material = toonPanel(LIVERIES[cabinet.livery].body);
+  dressWith(material, `side-${cabinet.id}`);
+  for (const side of [1, -1]) {
+    const panel = new THREE.Mesh(new THREE.PlaneGeometry(CABINET_DEPTH * 0.8, 1.6), material);
+    panel.position.set((side * CABINET_WIDTH) / 2 + side * 0.025, 1.05, -0.02);
+    panel.rotation.y = (side * Math.PI) / 2;
+    group.add(panel);
+  }
+  return group;
 }
 
 function body(cabinet: Cabinet): THREE.Group {
@@ -91,9 +111,10 @@ function body(cabinet: Cabinet): THREE.Group {
 /** A cabinet, placed and turned, with its live screen. */
 export function buildCabinet(cabinet: Cabinet): CabinetView {
   const group = new THREE.Group();
-  group.add(body(cabinet), marquee(cabinet.title));
+  group.add(body(cabinet), marquee(cabinet), sideArt(cabinet));
 
   const screen = pixelCanvas(SCREEN_W, SCREEN_H);
+  let table = tableLines([]);
   const screenMesh = part(
     new THREE.PlaneGeometry(0.78, 0.58),
     new THREE.MeshBasicMaterial({ map: screen.texture }),
@@ -120,8 +141,12 @@ export function buildCabinet(cabinet: Cabinet): CabinetView {
     group,
     screenCenter,
     tick(t) {
-      paintAttract(screen.ctx, cabinet.attract, t);
+      if (showsTable(t, cabinet.game !== undefined)) paintTable(screen.ctx, table);
+      else paintAttract(screen.ctx, cabinet.attract, t);
       screen.texture.needsUpdate = true;
+    },
+    setScores(scores) {
+      table = tableLines(scores);
     },
     setHighlighted(on) {
       halo.visible = on;

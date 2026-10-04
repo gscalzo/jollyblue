@@ -18,3 +18,4 @@ records use `template.md`.
 | 0011 | [Art is generated on fal by a script and committed as pixel art](0011-art-pipeline-on-fal.md)                          |
 | 0012 | [The render smoke test builds the scene; WebGL is checked by eye](0012-render-smoke-test-builds-the-scene.md)          |
 | 0013 | [The hall owns Back; runs are recorded under the owner's initials](0013-the-hall-owns-back-and-the-owners-initials.md) |
+| 0014 | [sharp snaps the generated art to pixels; the first art set](0014-sharp-snaps-the-art.md)                              |

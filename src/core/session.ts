@@ -113,11 +113,16 @@ export function handover(
   return null;
 }
 
-/** The line the hall shows at the bottom of the screen, if any. */
-export function prompt(session: Session, near: Cabinet | null): string | null {
+/** The line the hall shows at the bottom of the screen, if any; `best` is the game's top run. */
+export function prompt(
+  session: Session,
+  near: Cabinet | null,
+  best: string | null = null,
+): string | null {
   if (session.kind === 'notice') return `${session.cabinet.title} — OUT OF ORDER`;
   if (session.kind !== 'hall' || near === null) return null;
-  return near.game === undefined ? `${near.title} — E / A` : `PLAY ${near.title} — E / A`;
+  if (near.game === undefined) return `${near.title} — E / A`;
+  return best === null ? `PLAY ${near.title} — E / A` : `PLAY ${near.title} — ${best} — E / A`;
 }
 
 /** How much closer the camera is once inside a screen. */

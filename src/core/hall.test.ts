@@ -56,6 +56,10 @@ describe('validateHall', () => {
     );
   });
 
+  it('finds a bad jingle', () => {
+    expect(validateHall(hall([cabinet({ jingle: 'C5 X9' })]))).toEqual(['a has a bad jingle']);
+  });
+
   it('finds a bad game id', () => {
     expect(validateHall(hall([cabinet({ game: 'Moon Patrol' })]))).toEqual([
       'a names a bad game id',

@@ -47,7 +47,12 @@ silent change.
   Worker and the hall
 - `worker/` — Hono API: `app.ts`, `access.ts` (JWT), `scores.ts`; route tests
   run against the real migrations through `worker/test/fake-d1.ts`
-- `src/` — the hall: `core/` (tested logic), `render/` (Three.js),
-  `main.ts`, `palette.ts`, `styles.css`
-- `scripts/` — the gate scripts
+- `src/` — the hall: `core/` (tested logic: geometry, hall data, input,
+  avatar, session, game contract, audio, scoreboard, pixel font),
+  `render/` (Three.js and the DOM overlays), `games/` (one module per game,
+  registered in `games/index.ts`), the wiring (`main.ts`, `devices.ts`,
+  `sound.ts`, `scorebook.ts`, `game-slot.ts`), `palette.ts`, `styles.css`
+- `art/manifest.json` — the art recipes; `public/art/` — the committed PNGs;
+  regenerate with `node scripts/generate-art.mjs` (needs `FAL_KEY`)
+- `scripts/` — the gate scripts and the art pipeline
 - `migrations/` — D1 schema; `docs/adr/` — the decisions
