@@ -57,7 +57,7 @@ function run(root: HTMLElement): void {
   const devices = listenToDevices(window);
   const sound = createSound();
   const book = createScoreBook(cabinets);
-  const slot = createGameSlot(overlay.gameCanvas, devices, book);
+  const slot = createGameSlot(overlay.gameCanvas, devices, book, () => sound.gameAudio());
   overlay.setMuted(sound.muted);
   book.refresh();
   // Browsers only let sound start from a gesture.

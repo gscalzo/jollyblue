@@ -1,7 +1,8 @@
 /**
- * The game contract (ADR-0005). A game is a lazily loaded module whose
- * default export makes a Game; the hall mounts it on its own canvas with
- * the shared input layer and listens for its score and its exit.
+ * The game contract (ADR-0005, ADR-0020). A game is a lazily loaded module
+ * whose default export makes a Game; the hall mounts it on its own canvas
+ * with the shared input layer and its audio output, and listens for its
+ * score and its exit.
  */
 import type { Intent } from './input';
 
@@ -16,8 +17,22 @@ export interface GameEvents {
   exit(): void;
 }
 
+/**
+ * Where a game makes sound: the hall's audio context and a node the hall
+ * mutes with M. Null when sound has not been unlocked yet.
+ */
+export interface GameAudio {
+  context: AudioContext;
+  out: AudioNode;
+}
+
 export interface Game {
-  mount(canvas: HTMLCanvasElement, input: InputSource, events: GameEvents): void;
+  mount(
+    canvas: HTMLCanvasElement,
+    input: InputSource,
+    events: GameEvents,
+    audio: GameAudio | null,
+  ): void;
   unmount(): void;
 }
 
@@ -42,7 +57,12 @@ export interface Running {
 export function startGame(
   loaders: GameLoaders,
   id: string,
-  mount: { canvas: HTMLCanvasElement; input: InputSource; events: GameEvents },
+  mount: {
+    canvas: HTMLCanvasElement;
+    input: InputSource;
+    events: GameEvents;
+    audio: GameAudio | null;
+  },
   onError: (error: unknown) => void,
 ): Running {
   let stopped = false;
@@ -52,7 +72,7 @@ export function startGame(
     (module) => {
       if (stopped) return;
       game = module.default();
-      game.mount(mount.canvas, mount.input, mount.events);
+      game.mount(mount.canvas, mount.input, mount.events, mount.audio);
     },
     (error: unknown) => {
       onError(error);

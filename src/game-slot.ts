@@ -1,6 +1,6 @@
 /** Where a cabinet's game runs (ADR-0005): started as the dive ends, stopped as the player leaves. */
 import { startGame } from './core/game';
-import type { InputSource, Running } from './core/game';
+import type { GameAudio, InputSource, Running } from './core/game';
 import type { Cabinet } from './core/hall';
 import { GAMES } from './games';
 import type { ScoreBook } from './scorebook';
@@ -16,6 +16,7 @@ export function createGameSlot(
   canvas: HTMLCanvasElement,
   input: InputSource,
   book: ScoreBook,
+  audio: () => GameAudio | null,
 ): GameSlot {
   let running: Running | null = null;
   let exitRequested = false;
@@ -29,7 +30,7 @@ export function createGameSlot(
           exitRequested = true;
         },
       };
-      running = startGame(GAMES, game, { canvas, input, events }, console.error);
+      running = startGame(GAMES, game, { canvas, input, events, audio: audio() }, console.error);
     },
     stop() {
       running?.stop();

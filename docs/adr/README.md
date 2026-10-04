@@ -24,3 +24,4 @@ records use `template.md`.
 | 0017 | [Mars Patrol 3D's design: side-on, one lane, depth that warns](0017-mars-patrol-design.md)                             |
 | 0018 | [The games are shiny and modern; the hall stays low-res](0018-games-are-shiny.md)                                      |
 | 0019 | [Each game's core joins the logic core](0019-game-cores-in-the-logic-core.md)                                          |
+| 0020 | [Games play through the hall's audio](0020-games-play-through-the-halls-audio.md)                                      |

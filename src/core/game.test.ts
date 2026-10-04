@@ -13,7 +13,8 @@ function fakeGame() {
 function setup(loaders: GameLoaders) {
   const exit = vi.fn();
   const events: GameEvents = { score: vi.fn(), exit };
-  const mount = { canvas: {} as HTMLCanvasElement, input: { read: () => IDLE }, events };
+  const audio = { context: {} as AudioContext, out: {} as AudioNode };
+  const mount = { canvas: {} as HTMLCanvasElement, input: { read: () => IDLE }, events, audio };
   const onError = vi.fn();
   return {
     events,
@@ -30,7 +31,7 @@ describe('startGame', () => {
     const s = setup({ g: () => Promise.resolve({ default: () => game }) });
     const running = s.start('g');
     await running.ready;
-    expect(mount).toHaveBeenCalledWith(s.mount.canvas, s.mount.input, s.events);
+    expect(mount).toHaveBeenCalledWith(s.mount.canvas, s.mount.input, s.events, s.mount.audio);
     running.stop();
     expect(unmount).toHaveBeenCalledTimes(1);
     running.stop();

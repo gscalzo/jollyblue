@@ -40,10 +40,11 @@ arcade game, set on Mars. Each slice is again its own merge to `main`:
    gate globs for game cores. The stub still runs.
 2. **Drive** — the core simulation and the scene: the buggy, the speed
    lever, jumps, craters through A–E, death, respawn and lives, the title,
-   the HUD, the results, the score posted; the game's audio through the
-   hall's graph, with jump, landing and crash sounds.
-3. **Guns** — small and big rocks, the forward and upward shots, the full
-   scoring, the checkpoint time bonus, extra lives.
+   the HUD, the results, the score posted, checkpoint bonuses and extra
+   lives; the game's audio through the hall's graph (ADR-0020), with jump,
+   landing and crash sounds.
+3. **Guns** — small and big rocks, the forward and upward shots, the rest
+   of the scoring.
 4. **UFOs** — the approach from depth, bombs and their shadows, bomb
    craters, D and E tuned.
 5. **Music** — the game's own Lyria track.

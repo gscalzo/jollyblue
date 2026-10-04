@@ -2,5 +2,5 @@
 import type { GameLoaders } from '../core/game';
 
 export const GAMES: GameLoaders = {
-  'mars-patrol-3d': () => import('./mars-patrol-3d'),
+  'mars-patrol-3d': () => import('./mars-patrol'),
 };

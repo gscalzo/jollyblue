@@ -51,11 +51,10 @@ body {
   opacity: 0;
 }
 
+/* Games render at full resolution (ADR-0018): no stretching, no hard pixels. */
 .game {
   display: none;
   background: var(--veil);
-  image-rendering: pixelated;
-  object-fit: contain;
 }
 
 .game.on {

@@ -70,3 +70,79 @@ export const TYPE = {
   marquee: 'bold 10px ui-monospace, Menlo, monospace',
   screen: 'bold 7px ui-monospace, Menlo, monospace',
 } as const;
+
+/**
+ * Mars Patrol 3D (ADR-0018): the games are shiny and full-resolution, so this
+ * block carries physically based colours and the render's knobs — exposure,
+ * bloom, fog — instead of toon bands.
+ */
+export const MARS = {
+  skyTop: 0x150b2a,
+  skyMid: 0x6a2f5a,
+  skyHorizon: 0xf08a5a,
+  sunDisc: 0xffe2b8,
+  sunLight: 0xffc9a0,
+  hemiSky: 0xc48aa0,
+  hemiGround: 0x5a2416,
+  fog: 0xc8785a,
+  dust: 0xcc6a3e,
+  dustDark: 0x8e3a20,
+  dustLight: 0xe39a68,
+  craterFloor: 0x5a2014,
+  pebble: 0x7a3826,
+  mesa: 0xa84e30,
+  mesaFar: 0xc07454,
+  mountain: 0xd29274,
+  phobos: 0xcfc0b0,
+  deimos: 0xa89482,
+  star: 0xfff6ea,
+  dome: 0x9fb4c8,
+  domeGlow: 0x6ff6ff,
+  hull: 0xd9dee6,
+  hullAccent: 0x24c8ff,
+  chassis: 0x2a2e38,
+  glass: 0x0e1a28,
+  tyre: 0x17171b,
+  rim: 0xc8ccd6,
+  headlight: 0xfff4d0,
+  beacon: 0xff3b5c,
+  muzzle: 0x3a3f4a,
+  flash: 0xfff1a0,
+  shot: 0x8ff8ff,
+  fire: 0xffa040,
+  spark: 0xffe088,
+  smoke: 0x3a2a2a,
+  ufoHull: 0xa4aec0,
+  ufoGlow: 0xff3bd0,
+  ufoDome: 0x7ff0ff,
+  bomb: 0x2c2c36,
+  bombGlow: 0xff5040,
+  shadow: 0x000000,
+  untinted: 0xffffff,
+} as const;
+
+/** The game's render knobs. */
+export const MARS_LOOK = {
+  exposure: 0.95,
+  maxPixelRatio: 2,
+  fov: 32,
+  fogNear: 70,
+  fogFar: 520,
+  bloom: { strength: 0.55, radius: 0.4, threshold: 0.92 },
+  shadowMapSize: 2048,
+  /** How much of the room environment shows in reflections. */
+  environment: 0.35,
+} as const;
+
+/** Colours painted on the game's HUD canvas, as CSS strings. */
+export const MARS_INK = {
+  text: '#fff4e6',
+  accent: '#5ff2ff',
+  warm: '#ffb36b',
+  dim: 'rgba(255, 244, 230, 0.45)',
+  glow: '#ff8a4a',
+  backdrop: 'rgba(10, 6, 20, 0.35)',
+} as const;
+
+/** The HUD's typeface, sized by the painter. */
+export const MARS_FONT = '"Avenir Next", "Futura", "Segoe UI", system-ui, sans-serif';

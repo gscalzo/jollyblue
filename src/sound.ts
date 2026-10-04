@@ -1,9 +1,11 @@
 /**
  * The Web Audio engine (ADR-0015): one Lyria chiptune for the hall, looped
  * with a crossfade and faded out while a game plays, plus soft synthesised
- * footsteps and a coin. Nothing sounds until the first key press (browser
+ * footsteps and a coin. A game plays through its own bus under the same
+ * master (ADR-0020), so M mutes it too. Nothing sounds until the first key press (browser
  * policy), and M toggles it, remembered per browser.
  */
+import type { GameAudio } from './core/game';
 import { dueToStart, HALL_TRACK, loopPeriod } from './core/music';
 
 const LOOKAHEAD = 0.5;
@@ -20,6 +22,8 @@ export interface Sound {
   footstep(): void;
   coin(): void;
   toggleMute(): boolean;
+  /** The bus a game plays through, under the master; null before unlock. */
+  gameAudio(): GameAudio | null;
   readonly muted: boolean;
 }
 
@@ -93,6 +97,7 @@ export function createSound(): Sound {
   let track: AudioBuffer | null = null;
   let nextStart = 0;
   let muted = readMuted();
+  let gameBus: GameAudio | null = null;
 
   return {
     get muted() {
@@ -141,6 +146,15 @@ export function createSound(): Sound {
       const now = ctx.currentTime;
       blip(ctx, master, { hz: 1318.5, at: now, length: 0.07 });
       blip(ctx, master, { hz: 1760, at: now + 0.07, length: 0.25 });
+    },
+    gameAudio() {
+      if (!ctx || !master) return null;
+      if (!gameBus) {
+        const out = ctx.createGain();
+        out.connect(master);
+        gameBus = { context: ctx, out };
+      }
+      return gameBus;
     },
     toggleMute() {
       muted = !muted;
