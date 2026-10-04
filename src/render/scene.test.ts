@@ -3,6 +3,8 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { facingVector } from '../core/geometry';
 import { HALL } from '../core/hall';
 import { installFakeCanvas } from '../test/fake-canvas';
+import { spawnAvatar } from '../core/avatar';
+import { buildAvatar } from './avatar';
 import { buildCabinet } from './cabinet';
 import { buildRoom } from './room';
 
@@ -29,5 +31,14 @@ describe('the scene builds', () => {
       expect(offset).toBeGreaterThan(0);
       expect(view.screenCenter.y).toBeGreaterThan(1);
     }
+  });
+
+  it('builds the avatar and poses it where it stands', () => {
+    const view = buildAvatar();
+    const avatar = { ...spawnAvatar(HALL), phase: 1, pace: 1 };
+    view.update(avatar);
+    expect(view.group.position.x).toBe(HALL.spawn.x);
+    expect(view.group.position.z).toBe(HALL.spawn.z);
+    expect(view.group.rotation.y).toBe(avatar.heading);
   });
 });
