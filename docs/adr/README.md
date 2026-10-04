@@ -16,3 +16,4 @@ records use `template.md`.
 | 0009 | [jollyblue on effectivecode.co.uk and gioscalzo.com, deployed from main](0009-hostnames-and-deploy.md)         |
 | 0010 | [Sound is synthesised in code and positional](0010-synthesised-positional-sound.md)                            |
 | 0011 | [Art is generated on fal by a script and committed as pixel art](0011-art-pipeline-on-fal.md)                  |
+| 0012 | [The render smoke test builds the scene; WebGL is checked by eye](0012-render-smoke-test-builds-the-scene.md)  |

@@ -7,28 +7,32 @@
   --ink: #f4e9d8;
   --night: #120d24;
   --neon: #ff5fa2;
+  --glow: #fff27a;
+  --veil: #07060f;
   --font-display: ui-monospace, 'SF Mono', Menlo, monospace;
+  --shadow-neon: 0 0 6px #ff5fa2;
+  --motion-fade: opacity 400ms linear;
 }
 
 html,
 body {
   margin: 0;
   height: 100%;
+  overflow: hidden;
   background: var(--night);
   color: var(--ink);
   font-family: var(--font-display);
 }
 
 #root {
-  display: grid;
-  place-items: center;
+  position: relative;
   height: 100%;
 }
 
-.marquee {
-  margin: 0;
-  font-size: clamp(2rem, 8vw, 6rem);
-  letter-spacing: 0.2em;
-  color: var(--neon);
-  text-transform: uppercase;
+/* The scene renders small; the browser stretches it in hard pixels. */
+.stage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
 }

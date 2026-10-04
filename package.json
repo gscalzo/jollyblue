@@ -27,7 +27,8 @@
     "db:migrate:remote": "wrangler d1 migrations apply jollyblue --remote"
   },
   "dependencies": {
-    "hono": "^4.13.13"
+    "hono": "^4.13.13",
+    "three": "^0.186.1"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.62.5",
@@ -35,6 +36,7 @@
     "@eslint/js": "^9.39.5",
     "@stryker-mutator/core": "^10.0.0",
     "@stryker-mutator/vitest-runner": "^10.0.0",
+    "@types/three": "^0.186.0",
     "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^9.39.5",
     "eslint-plugin-sonarjs": "^4.2.2",
@@ -50,6 +52,7 @@
   },
   "allowScripts": {
     "workerd@1.20261001.1": true,
-    "esbuild@0.28.1": true
+    "esbuild@0.28.1": true,
+    "fsevents": false
   }
 }

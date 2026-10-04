@@ -1,6 +1,6 @@
 # 0008 — Bottega's gates on the logic core; rendering is smoke-tested
 
-**Status:** accepted
+**Status:** accepted; the smoke-test clause is superseded-by-0012
 **Date:** 2026-10-04
 
 ## Context
