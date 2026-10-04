@@ -8,7 +8,7 @@ once; after that, merging to `main` deploys.
 ## 1. Cloudflare resources
 
 - D1 database `jollyblue` (created 2026-10-04, id in `wrangler.jsonc`).
-- Zero Trust → **Access → Applications → Add an application → Self-hosted**:
+- Access application `jollyblue` (created 2026-10-04, id b011ea2d-743a-4a59-ae27-ef985a2b4284). To recreate: Zero Trust → **Access → Applications → Add an application → Self-hosted**:
   name `jollyblue`, domain `jollyblue.effectivecode.co.uk` plus the
   additional domain `jollyblue.gioscalzo.com` (one application, one AUD),
   session duration 730 h, the account's reusable **Allow owner** policy.
