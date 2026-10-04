@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   checkpointX,
   CRATER_DEPTH,
+  LANDING_ROOM,
   cratersBehind,
   finish,
   groundHeight,
@@ -11,14 +12,14 @@ import {
   validateCourse,
   WIDEST_CRATER,
 } from './course';
-import type { Course, Crater } from './course';
-import { DRIVE, RULES } from './tuning';
+import type { Course, Crater, Rock } from './course';
+import { DRIVE, ROCKS, RULES } from './tuning';
 
 const START = { letter: 'A', x: 0, par: 0 };
 const END = { letter: 'B', x: 200, par: 30 };
 
-function course(craters: Crater[], checkpoints = [START, END]): Course {
-  return { checkpoints, craters };
+function course(craters: Crater[], checkpoints = [START, END], rocks: Rock[] = []): Course {
+  return { checkpoints, craters, rocks };
 }
 
 describe('the section', () => {
@@ -98,6 +99,65 @@ describe('validateCourse', () => {
     expect(validateCourse(course([{ x: 97, width: 3.01 }], three))).toEqual([
       'crater 0 crowds a checkpoint',
     ]);
+  });
+});
+
+describe('rocks in the course', () => {
+  const small = (x: number): Rock => ({ x, size: 'small' });
+  const room = LANDING_ROOM;
+
+  it('accepts well-spaced rocks of known sizes', () => {
+    expect(
+      validateCourse(course([], [START, END], [small(50), small(60), { x: 80, size: 'big' }])),
+    ).toEqual([]);
+  });
+
+  it('rejects a malformed rock', () => {
+    expect(validateCourse(course([], [START, END], [small(Number.NaN)]))).toEqual([
+      'rock 0 is malformed',
+    ]);
+    const odd = { x: 50, size: 'toString' } as unknown as Rock;
+    expect(validateCourse(course([], [START, END], [odd]))).toEqual(['rock 0 is malformed']);
+  });
+
+  it('keeps room to land between rocks, and between rocks and craters', () => {
+    const half = ROCKS.small.half;
+    expect(
+      validateCourse(course([], [START, END], [small(50), small(50 + 2 * half + room)])),
+    ).toEqual([]);
+    expect(
+      validateCourse(course([], [START, END], [small(50), small(50 + 2 * half + room - 0.01)])),
+    ).toEqual(['rock 1 leaves no room to land']);
+    const pit = [{ x: 50, width: 3 }];
+    expect(validateCourse(course(pit, [START, END], [small(53 + room + half)]))).toEqual([]);
+    expect(validateCourse(course(pit, [START, END], [small(53 + room + half - 0.01)]))).toEqual([
+      'rock 0 leaves no room to land',
+    ]);
+    expect(validateCourse(course(pit, [START, END], [small(50 - room - half)]))).toEqual([]);
+    expect(validateCourse(course(pit, [START, END], [small(50 - room - half + 0.01)]))).toEqual([
+      'rock 0 leaves no room to land',
+    ]);
+  });
+
+  it('keeps rocks before the finish and clear of every checkpoint', () => {
+    const half = ROCKS.small.half;
+    expect(validateCourse(course([], [START, END], [small(200 - half - 0.01)]))).toEqual([]);
+    expect(validateCourse(course([], [START, END], [small(200 - half)]))).toEqual([
+      'rock 0 is past the finish',
+    ]);
+    expect(validateCourse(course([], [START, END], [small(RESPAWN_ROOM + half)]))).toEqual([]);
+    expect(validateCourse(course([], [START, END], [small(RESPAWN_ROOM + half - 0.01)]))).toEqual([
+      'rock 0 crowds a checkpoint',
+    ]);
+  });
+
+  it('puts small rocks in B, big ones in C, and both later', () => {
+    const between = (from: number, to: number) =>
+      SECTION.rocks.filter((r) => r.x > from && r.x < to);
+    expect(between(0, 300)).toEqual([]);
+    expect(between(300, 600).every((r) => r.size === 'small')).toBe(true);
+    expect(between(600, 900).some((r) => r.size === 'big')).toBe(true);
+    expect(between(900, 1200).length).toBeGreaterThan(0);
   });
 });
 

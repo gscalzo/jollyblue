@@ -31,6 +31,31 @@ export const RULES = {
   resultsSeconds: 1,
   /** Metres trimmed from each end of a crater's deadly span. */
   craterMargin: 0.35,
+  /** Metres trimmed from a rock's sides and top before it counts as a hit. */
+  rockMargin: 0.2,
+} as const;
+
+/** The two rocks: half their width, their height, the shots they take and what they pay. */
+export const ROCKS = {
+  small: { half: 0.5, height: 0.8, hits: 1, jumped: 80, shot: 100 },
+  big: { half: 0.8, height: 1.4, hits: 2, jumped: 100, shot: 200 },
+} as const;
+
+/** The buggy's two guns (ADR-0017): one bolt along the road, up to three straight up. */
+export const GUNS = {
+  /** Metres per second a forward bolt flies faster than the buggy. */
+  boltSpeed: 34,
+  /** How far a forward bolt flies before it fades. */
+  range: 30,
+  upSpeed: 26,
+  /** Height where an upward bolt fades. */
+  ceiling: 24,
+  maxUp: 3,
+  /** Where the bolts leave the buggy, from its middle. */
+  frontX: 1.9,
+  frontY: 0.72,
+  topX: -0.35,
+  topY: 2.25,
 } as const;
 
 export const POINTS = {

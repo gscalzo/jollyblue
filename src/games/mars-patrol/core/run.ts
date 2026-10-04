@@ -1,15 +1,18 @@
 /**
- * One run (ADR-0017): drive, jump, crash, respawn at the last checkpoint,
- * clear the section or run out of lives. A pure step at a fixed rate; what
- * happened comes back as events for the sound and the screen.
+ * One run (ADR-0017): drive, jump, shoot, crash, respawn at the last
+ * checkpoint, clear the section or run out of lives. A pure step at a fixed
+ * rate; what happened comes back as events for the sound and the screen.
  */
 import { airborne, drive, startBuggy } from './buggy';
 import type { Buggy } from './buggy';
 import { checkpointX, cratersBehind, finish, inCrater } from './course';
-import type { Course } from './course';
+import type { Course, RockSize } from './course';
+import { advance, fire, HOLSTERED } from './guns';
+import type { Bolt, Guns } from './guns';
+import { hitsBuggy, jumpedPoints, restore, standing, struck } from './rocks';
 import { checkpointBonus, clearBonus, pay } from './scoring';
 import type { Purse } from './scoring';
-import { DRIVE, POINTS, RULES, STEP } from './tuning';
+import { DRIVE, POINTS, ROCKS, RULES, STEP } from './tuning';
 
 type Phase =
   { kind: 'driving' } | { kind: 'crashed'; left: number } | { kind: 'over' } | { kind: 'clear' };
@@ -22,6 +25,9 @@ export interface Run {
   /** Seconds since the last checkpoint, for its par. */
   stretch: number;
   phase: Phase;
+  /** Shots each rock has taken, by its index in the course. */
+  damage: readonly number[];
+  guns: Guns;
 }
 
 /** This step's controls: the lever, and the presses that went down. */
@@ -34,6 +40,9 @@ export interface Controls {
 export type RunEvent =
   | { kind: 'jump' }
   | { kind: 'land' }
+  | { kind: 'fire' }
+  | { kind: 'hit'; x: number }
+  | { kind: 'break'; x: number; size: RockSize }
   | { kind: 'crash' }
   | { kind: 'respawn' }
   | { kind: 'points'; points: number }
@@ -54,6 +63,8 @@ export function newRun(course: Course): Run {
     checkpoint: 0,
     stretch: 0,
     phase: { kind: 'driving' },
+    damage: course.rocks.map(() => 0),
+    guns: HOLSTERED,
   };
 }
 
@@ -74,7 +85,34 @@ function move(course: Course, run: Run, controls: Controls): Stepped {
   const s = { run: { ...run, buggy: d.buggy, stretch: run.stretch + STEP }, events };
   const rear = (b: Buggy) => b.x - DRIVE.half;
   const passed = cratersBehind(course, rear(d.buggy)) - cratersBehind(course, rear(before));
-  return award(s, passed * POINTS.crater);
+  const jumped = jumpedPoints(course, run.damage, rear(before), rear(d.buggy));
+  return award(s, passed * POINTS.crater + jumped);
+}
+
+function strike(course: Course, s: Stepped, before: Bolt | null): Stepped {
+  const bolt = s.run.guns.forward;
+  if (!before || !bolt) return s;
+  const hit = struck(course, s.run.damage, { from: before.x, to: bolt.x, y: bolt.y });
+  if (!hit) return s;
+  const damage = s.run.damage.map((d, k) => (k === hit.i ? d + 1 : d));
+  const run = { ...s.run, damage, guns: { ...s.run.guns, forward: null } };
+  const { rock } = hit;
+  if (standing(rock, damage, hit.i))
+    return { run, events: [...s.events, { kind: 'hit', x: rock.x }] };
+  const broke: RunEvent = { kind: 'break', x: rock.x, size: rock.size };
+  return award({ run, events: [...s.events, broke] }, ROCKS[rock.size].shot);
+}
+
+function shoot(course: Course, s: Stepped, trigger: boolean): Stepped {
+  const shot = trigger ? fire(s.run.guns, s.run.buggy) : { guns: s.run.guns, fired: false };
+  const events: RunEvent[] = shot.fired ? [...s.events, { kind: 'fire' }] : s.events;
+  const run = { ...s.run, guns: advance(shot.guns) };
+  return strike(course, { run, events }, shot.guns.forward);
+}
+
+function wrecked(course: Course, run: Run): boolean {
+  const { buggy } = run;
+  return (!airborne(buggy) && inCrater(course, buggy.x)) || hitsBuggy(course, run.damage, buggy);
 }
 
 function crash(s: Stepped): Stepped {
@@ -105,8 +143,8 @@ function clear(course: Course, s: Stepped): Stepped {
 }
 
 function driving(course: Course, run: Run, controls: Controls): Stepped {
-  const s = move(course, run, controls);
-  if (!airborne(s.run.buggy) && inCrater(course, s.run.buggy.x)) return crash(s);
+  const s = shoot(course, move(course, run, controls), controls.fire);
+  if (wrecked(course, s.run)) return crash(s);
   return clear(course, passCheckpoint(course, s));
 }
 
@@ -116,6 +154,8 @@ function respawn(course: Course, run: Run): Stepped {
     buggy: startBuggy(checkpointX(course, run.checkpoint)),
     stretch: 0,
     phase: { kind: 'driving' },
+    damage: restore(course, run.damage, checkpointX(course, run.checkpoint)),
+    guns: HOLSTERED,
   };
   return { run: next, events: [{ kind: 'respawn' }] };
 }

@@ -4,7 +4,7 @@ import type { Course } from './course';
 import { newRun } from './run';
 import { DRIVE } from './tuning';
 
-const COURSE: Course = { checkpoints: [{ letter: 'A', x: 0, par: 0 }], craters: [] };
+const COURSE: Course = { checkpoints: [{ letter: 'A', x: 0, par: 0 }], craters: [], rocks: [] };
 
 describe('the camera', () => {
   it('looks less far ahead as the buggy speeds up', () => {
@@ -23,7 +23,7 @@ describe('the camera', () => {
     expect(framing({ kind: 'playing', run: fast })).toEqual({
       focus: 40 + lead(DRIVE.cruise + 1),
       yaw: 0,
-      distance: 22,
+      distance: 30,
     });
     expect(framing({ kind: 'results', run: fast, t: 0 }).focus).toBe(40 + lead(DRIVE.cruise + 1));
   });

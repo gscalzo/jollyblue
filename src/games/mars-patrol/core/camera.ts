@@ -16,9 +16,9 @@ export interface Framing {
 }
 
 /** Metres the camera looks ahead of the buggy at cruise. */
-export const LEAD = 3.5;
+export const LEAD = 6;
 /** Metres less lead for each m/s above cruise. */
-export const LEAD_PER_SPEED = 0.5;
+export const LEAD_PER_SPEED = 0.6;
 
 export function lead(speed: number): number {
   return LEAD - (speed - DRIVE.cruise) * LEAD_PER_SPEED;
@@ -29,5 +29,5 @@ export function framing(screen: Screen): Framing {
     return { focus: 0, yaw: 0.55 + 0.25 * Math.sin(screen.t * 0.25), distance: 9 };
   }
   const { buggy } = screen.run;
-  return { focus: buggy.x + lead(buggy.speed), yaw: 0, distance: 22 };
+  return { focus: buggy.x + lead(buggy.speed), yaw: 0, distance: 30 };
 }

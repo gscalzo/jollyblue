@@ -17,7 +17,7 @@ interface Particle {
   colour: THREE.Color;
 }
 
-type Burst = 'crash' | 'dust';
+type Burst = 'crash' | 'dust' | 'spark' | 'rubble';
 
 export interface Fx {
   group: THREE.Group;
@@ -36,6 +36,15 @@ const RECIPES: Record<
     life: 1.4,
     size: 0.16,
     colours: [MARS.fire, MARS.spark, MARS.smoke],
+  },
+  spark: { count: 24, speed: 6, up: 3, life: 0.4, size: 0.07, colours: [MARS.shot, MARS.spark] },
+  rubble: {
+    count: 60,
+    speed: 5,
+    up: 5,
+    life: 1.1,
+    size: 0.18,
+    colours: [MARS.pebble, MARS.dustDark, MARS.spark],
   },
   dust: {
     count: 26,

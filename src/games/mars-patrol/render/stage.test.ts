@@ -7,7 +7,8 @@ import { newRun } from '../core/run';
 import { buildStage } from './view';
 import { terrainHeight } from './world';
 
-describe('the Mars Patrol stage builds (ADR-0012)', () => {
+// Building the whole section is slow under Stryker's instrumentation on CI.
+describe('the Mars Patrol stage builds (ADR-0012)', { timeout: 30_000 }, () => {
   it('builds the world, the buggy and its six wheels, lit by the sun', () => {
     const stage = buildStage(SECTION);
     expect(stage.buggy.wheels).toHaveLength(6);
@@ -27,7 +28,7 @@ describe('the Mars Patrol stage builds (ADR-0012)', () => {
       i < 2000 && screen.kind === 'playing' && screen.run.phase.kind !== 'crashed';
       i++
     ) {
-      const next = stepScreen(SECTION, screen, { lever: 1, jump: false, fire: false });
+      const next = stepScreen(SECTION, screen, { lever: 1, jump: false, fire: i % 20 === 0 });
       screen = next.screen;
       stage.update(screen, next.events, 1 / 60, i / 60);
     }

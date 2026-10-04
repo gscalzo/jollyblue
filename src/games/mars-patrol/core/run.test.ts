@@ -3,7 +3,7 @@ import type { Course } from './course';
 import { finished, newRun, stepRun } from './run';
 import type { Controls, Run, RunEvent } from './run';
 import { checkpointBonus, clearBonus } from './scoring';
-import { DRIVE, POINTS, RULES, STEP } from './tuning';
+import { DRIVE, GUNS, POINTS, ROCKS, RULES, STEP } from './tuning';
 
 const COURSE: Course = {
   checkpoints: [
@@ -12,6 +12,7 @@ const COURSE: Course = {
     { letter: 'C', x: 200, par: 20 },
   ],
   craters: [{ x: 40, width: 3 }],
+  rocks: [],
 };
 
 const IDLE: Controls = { lever: 0, jump: false, fire: false };
@@ -165,5 +166,137 @@ describe('checkpoints and the finish', () => {
     const rich = { ...at(43), purse: { score: RULES.extraLives[0] - 10, lives: 2, extras: 0 } };
     const s = until(rich, (r) => r.purse.score >= RULES.extraLives[0]);
     expect(s.events).toEqual([{ kind: 'points', points: POINTS.crater }, { kind: 'extra-life' }]);
+  });
+});
+
+describe('rocks and guns', () => {
+  const ROCKY: Course = {
+    checkpoints: [
+      { letter: 'A', x: 0, par: 0 },
+      { letter: 'B', x: 100, par: 20 },
+      { letter: 'C', x: 200, par: 20 },
+    ],
+    craters: [],
+    rocks: [
+      { x: 40, size: 'small' },
+      { x: 70, size: 'big' },
+      { x: 150, size: 'small' },
+    ],
+  };
+  const FIRE: Controls = { ...IDLE, fire: true };
+
+  function drive(run: Run, done: (r: Run) => boolean, controls: (r: Run) => Controls) {
+    let current = run;
+    const events: RunEvent[] = [];
+    for (let i = 0; i < 5_000 && !done(current); i++) {
+      const s = stepRun(ROCKY, current, controls(current));
+      current = s.run;
+      events.push(...s.events);
+    }
+    expect(done(current)).toBe(true);
+    return { run: current, events };
+  }
+  const placed = (x: number) => {
+    const run = newRun(ROCKY);
+    return { ...run, buggy: { ...run.buggy, x } };
+  };
+
+  it('starts with every rock whole and the guns holstered', () => {
+    const run = newRun(ROCKY);
+    expect(run.damage).toEqual([0, 0, 0]);
+    expect(run.guns).toEqual({ forward: null, up: [] });
+  });
+
+  it('fires both guns on Fire', () => {
+    const s = stepRun(ROCKY, placed(10), FIRE);
+    expect(s.events).toEqual([{ kind: 'fire' }]);
+    expect(s.run.guns.forward).not.toBeNull();
+    expect(s.run.guns.up).toHaveLength(1);
+  });
+
+  it('says nothing when the guns have nothing left to fire', () => {
+    const run = stepRun(ROCKY, placed(10), FIRE).run;
+    const full = {
+      ...run,
+      guns: {
+        ...run.guns,
+        up: [run.guns.up[0], run.guns.up[0], run.guns.up[0]].filter((b) => b !== undefined),
+      },
+    };
+    expect(stepRun(ROCKY, full, FIRE).events).toEqual([]);
+  });
+
+  it('breaks a small rock with one bolt, for points', () => {
+    const first = stepRun(ROCKY, placed(20), FIRE);
+    const { run, events } = drive(
+      first.run,
+      (r) => r.damage[0] === 1,
+      () => IDLE,
+    );
+    expect(events).toEqual([
+      { kind: 'break', x: 40, size: 'small' },
+      { kind: 'points', points: ROCKS.small.shot },
+    ]);
+    expect(run.guns.forward).toBeNull();
+    expect(run.damage).toEqual([1, 0, 0]);
+    expect(run.purse.score).toBe(ROCKS.small.shot);
+  });
+
+  it('chips a big rock with the first bolt and breaks it with the second', () => {
+    const start = { ...placed(50), damage: [1, 0, 0] };
+    const one = drive(
+      stepRun(ROCKY, start, FIRE).run,
+      (r) => r.damage[1] === 1,
+      () => IDLE,
+    );
+    expect(one.events).toEqual([{ kind: 'hit', x: 70 }]);
+    expect(one.run.purse.score).toBe(0);
+    const two = drive(
+      stepRun(ROCKY, one.run, FIRE).run,
+      (r) => r.damage[1] === 2,
+      () => IDLE,
+    );
+    expect(two.events).toEqual([
+      { kind: 'break', x: 70, size: 'big' },
+      { kind: 'points', points: ROCKS.big.shot },
+    ]);
+  });
+
+  it('lets a bolt fade before it reaches a rock out of range', () => {
+    const run = placed(0);
+    const guns = { forward: { x: 35, y: 0.7, vx: 600, vy: 0, from: 35 - GUNS.range + 1 }, up: [] };
+    const s = stepRun(ROCKY, { ...run, guns }, IDLE);
+    expect(s.run.guns.forward).toBeNull();
+    expect(s.events).toEqual([]);
+  });
+
+  it('crashes into a rock it neither shoots nor jumps', () => {
+    const { run, events } = drive(
+      placed(20),
+      (r) => r.phase.kind !== 'driving',
+      () => IDLE,
+    );
+    expect(events).toEqual([{ kind: 'crash' }]);
+    expect(run.buggy.x).toBeLessThan(40);
+  });
+
+  it('pays for jumping a rock', () => {
+    const hopRock = (r: Run): Controls => (r.buggy.x > 36 && r.buggy.x < 37 ? JUMP : IDLE);
+    const { run, events } = drive(placed(20), (r) => r.buggy.x > 50, hopRock);
+    expect(events).toContainEqual({ kind: 'points', points: ROCKS.small.jumped });
+    expect(run.phase.kind).toBe('driving');
+  });
+
+  it('respawns with the rocks ahead put back and the guns holstered', () => {
+    const crashed = {
+      ...placed(160),
+      checkpoint: 1,
+      damage: [1, 2, 1],
+      guns: { forward: { x: 1, y: 1, vx: 1, vy: 0, from: 1 }, up: [] },
+      phase: { kind: 'crashed' as const, left: STEP },
+    };
+    const s = stepRun(ROCKY, crashed, IDLE);
+    expect(s.run.damage).toEqual([1, 2, 0]);
+    expect(s.run.guns).toEqual({ forward: null, up: [] });
   });
 });

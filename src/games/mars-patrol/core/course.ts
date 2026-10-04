@@ -1,8 +1,8 @@
 /**
- * The course (ADR-0017): checkpoints A to E and the craters between them,
- * hand-authored and validated. Positions are metres along the road.
+ * The course (ADR-0017): checkpoints A to E and the craters and rocks between
+ * them, hand-authored and validated. Positions are metres along the road.
  */
-import { DRIVE, RULES } from './tuning';
+import { DRIVE, ROCKS, RULES } from './tuning';
 
 interface Checkpoint {
   letter: string;
@@ -17,10 +17,19 @@ export interface Crater {
   width: number;
 }
 
+export type RockSize = keyof typeof ROCKS;
+
+export interface Rock {
+  /** The rock's middle. */
+  x: number;
+  size: RockSize;
+}
+
 export interface Course {
   /** The first is the start; passing the last clears the section. */
   checkpoints: readonly Checkpoint[];
   craters: readonly Crater[];
+  rocks: readonly Rock[];
 }
 
 /** Clear road kept after every checkpoint, so a respawn never lands in trouble. */
@@ -29,6 +38,9 @@ export const RESPAWN_ROOM = 20;
 export const WIDEST_CRATER = 4;
 /** How deep a crater looks; the logic only knows its span. */
 export const CRATER_DEPTH = 1.1;
+
+/** Clear road an obstacle keeps from the next, so a jump can land. */
+export const LANDING_ROOM = DRIVE.half * 4;
 
 /** Section A–E. Each stretch teaches one thing and tightens the rhythm. */
 export const SECTION: Course = {
@@ -45,23 +57,29 @@ export const SECTION: Course = {
     { x: 170, width: 2.5 },
     { x: 225, width: 3 },
     { x: 330, width: 3 },
-    { x: 378, width: 2.5 },
-    { x: 426, width: 3 },
-    { x: 474, width: 3.5 },
-    { x: 522, width: 3 },
+    { x: 430, width: 2.5 },
+    { x: 555, width: 3 },
     { x: 630, width: 3 },
-    { x: 672, width: 3.5 },
-    { x: 714, width: 2.5 },
-    { x: 756, width: 3 },
-    { x: 798, width: 3.5 },
-    { x: 840, width: 4 },
+    { x: 645, width: 3 },
+    { x: 750, width: 3.5 },
+    { x: 764, width: 3 },
+    { x: 860, width: 4 },
     { x: 930, width: 3.5 },
-    { x: 966, width: 3 },
-    { x: 1002, width: 4 },
-    { x: 1038, width: 3 },
-    { x: 1074, width: 3.5 },
-    { x: 1110, width: 4 },
-    { x: 1146, width: 3 },
+    { x: 1000, width: 3 },
+    { x: 1080, width: 4 },
+    { x: 1094, width: 3 },
+    { x: 1160, width: 3.5 },
+  ],
+  rocks: [
+    { x: 380, size: 'small' },
+    { x: 470, size: 'small' },
+    { x: 510, size: 'small' },
+    { x: 700, size: 'big' },
+    { x: 810, size: 'big' },
+    { x: 830, size: 'small' },
+    { x: 970, size: 'small' },
+    { x: 1040, size: 'big' },
+    { x: 1130, size: 'small' },
   ],
 };
 
@@ -85,21 +103,47 @@ function craterError(course: Course, crater: Crater, i: number): string | null {
   if (!finite(crater.x, crater.width)) return `crater ${i} is malformed`;
   if (crater.width <= 0 || crater.width > WIDEST_CRATER) return `crater ${i} cannot be jumped`;
   const before = course.craters[i - 1];
-  if (before && crater.x < before.x + before.width + DRIVE.half * 4) {
+  if (before && crater.x < before.x + before.width + LANDING_ROOM) {
     return `crater ${i} leaves no room to land`;
   }
   if (crater.x + crater.width >= finish(course)) return `crater ${i} is past the finish`;
-  const crowded = course.checkpoints.some(
-    (cp) => crater.x + crater.width > cp.x && crater.x < cp.x + RESPAWN_ROOM,
+  return crowds(course, crater.x, crater.x + crater.width)
+    ? `crater ${i} crowds a checkpoint`
+    : null;
+}
+
+/** Where a rock stands on the road. */
+export function rockSpan(rock: Rock): { from: number; to: number } {
+  const { half } = ROCKS[rock.size];
+  return { from: rock.x - half, to: rock.x + half };
+}
+
+function crowds(course: Course, from: number, to: number): boolean {
+  return course.checkpoints.some((cp) => to > cp.x && from < cp.x + RESPAWN_ROOM);
+}
+
+function rockError(course: Course, rock: Rock, i: number): string | null {
+  if (!Number.isFinite(rock.x) || !Object.hasOwn(ROCKS, rock.size)) return `rock ${i} is malformed`;
+  const { from, to } = rockSpan(rock);
+  const before = course.rocks[i - 1];
+  if (before && from < rockSpan(before).to + LANDING_ROOM)
+    return `rock ${i} leaves no room to land`;
+  const near = course.craters.some(
+    (c) => from < c.x + c.width + LANDING_ROOM && to > c.x - LANDING_ROOM,
   );
-  return crowded ? `crater ${i} crowds a checkpoint` : null;
+  if (near) return `rock ${i} leaves no room to land`;
+  if (to >= finish(course)) return `rock ${i} is past the finish`;
+  return crowds(course, from, to) ? `rock ${i} crowds a checkpoint` : null;
 }
 
 /** Every reason the course cannot be played; empty when it is sound. */
 export function validateCourse(course: Course): string[] {
   const errors = checkpointErrors(course);
   if (errors.length > 0) return errors;
-  return course.craters.flatMap((c, i) => craterError(course, c, i) ?? []);
+  return [
+    ...course.craters.flatMap((c, i) => craterError(course, c, i) ?? []),
+    ...course.rocks.flatMap((r, i) => rockError(course, r, i) ?? []),
+  ];
 }
 
 /** True when a buggy whose middle is at `x` would drop into a crater. */

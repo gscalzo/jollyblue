@@ -14,6 +14,7 @@ const COURSE: Course = {
     { letter: 'B', x: 100, par: 20 },
   ],
   craters: [],
+  rocks: [],
 };
 
 const intent = (x: number, y: number, action = false): Intent => ({

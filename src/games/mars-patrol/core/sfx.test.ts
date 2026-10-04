@@ -2,7 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { SFX, soundsFor } from './sfx';
 import type { SfxName } from './sfx';
 
-const NAMES: SfxName[] = ['start', 'jump', 'land', 'crash', 'checkpoint', 'extra', 'clear', 'over'];
+const NAMES: SfxName[] = [
+  'start',
+  'jump',
+  'land',
+  'fire',
+  'hit',
+  'break',
+  'crash',
+  'checkpoint',
+  'extra',
+  'clear',
+  'over',
+];
 
 describe('the effects', () => {
   it('are each a few audible tones', () => {
@@ -44,6 +56,9 @@ describe('soundsFor', () => {
         { kind: 'start' },
         { kind: 'jump' },
         { kind: 'land' },
+        { kind: 'fire' },
+        { kind: 'hit', x: 1 },
+        { kind: 'break', x: 1, size: 'big' },
         { kind: 'crash' },
         { kind: 'checkpoint', letter: 'B', bonus: 1 },
         { kind: 'extra-life' },
@@ -53,6 +68,18 @@ describe('soundsFor', () => {
         { kind: 'points', points: 50 },
         { kind: 'respawn' },
       ]),
-    ).toEqual(['start', 'jump', 'land', 'crash', 'checkpoint', 'extra', 'clear', 'over']);
+    ).toEqual([
+      'start',
+      'jump',
+      'land',
+      'fire',
+      'hit',
+      'break',
+      'crash',
+      'checkpoint',
+      'extra',
+      'clear',
+      'over',
+    ]);
   });
 });

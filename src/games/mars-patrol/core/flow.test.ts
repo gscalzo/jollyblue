@@ -12,6 +12,7 @@ const COURSE: Course = {
     { letter: 'B', x: 100, par: 20 },
   ],
   craters: [],
+  rocks: [],
 };
 const IDLE: Controls = { lever: 0, jump: false, fire: false };
 const FIRE: Controls = { ...IDLE, fire: true };

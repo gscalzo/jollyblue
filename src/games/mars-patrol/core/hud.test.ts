@@ -12,6 +12,7 @@ const COURSE: Course = {
     { letter: 'B', x: 100, par: 20 },
   ],
   craters: [],
+  rocks: [],
 };
 const run = newRun(COURSE);
 const at = (x: number) => ({ ...run, buggy: { ...run.buggy, x } });

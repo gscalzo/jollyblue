@@ -21,6 +21,7 @@ import type { Fx } from './fx';
 import { createHudLayer } from './hud';
 import { buildBuggy, WHEEL_RADIUS } from './models';
 import type { BuggyModel } from './models';
+import { buildProps } from './props';
 import { buildWorld } from './world';
 import type { World } from './world';
 
@@ -68,6 +69,8 @@ function react(fx: Fx, events: readonly GameEvent[], p: Pose): void {
   for (const e of events) {
     if (e.kind === 'crash') fx.burst('crash', p.x, 0.5);
     if (e.kind === 'land') fx.burst('dust', p.x, 0.1);
+    if (e.kind === 'hit') fx.burst('spark', e.x, 0.6);
+    if (e.kind === 'break') fx.burst('rubble', e.x, 0.5);
   }
 }
 
@@ -75,7 +78,8 @@ export function buildStage(course: Course): Stage {
   const world = buildWorld(course, finish(course));
   const buggy = buildBuggy();
   const fx = buildFx();
-  world.scene.add(buggy.root, fx.group);
+  const props = buildProps(course);
+  world.scene.add(buggy.root, fx.group, props.group);
   const camera = new THREE.PerspectiveCamera(MARS_LOOK.fov, 16 / 9, 0.5, 3000);
   const shot = { focus: 0, yaw: 0.5, distance: 9 };
   return {
@@ -88,6 +92,7 @@ export function buildStage(course: Course): Stage {
       poseBuggy(buggy, p, t);
       react(fx, events, p);
       fx.update(dt);
+      props.update(screen, events, dt);
       const want = framing(screen);
       const k = (rate: number) => 1 - Math.exp(-rate * dt);
       shot.focus += (want.focus - shot.focus) * k(FOLLOW.focus);

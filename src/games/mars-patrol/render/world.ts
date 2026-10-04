@@ -19,7 +19,7 @@ const COLUMN = 0.25;
 /** Rows across the road, back to front: fine near the road, coarse far away. */
 const ROWS = [
   -70, -50, -36, -26, -19, -14, -10, -7, -5.5, -4.5, -3.75, -3, -2.25, -1.5, -0.75, 0, 0.75, 1.5,
-  2.25, 3, 3.75, 4.5, 5.5, 7, 9, 12,
+  2.25, 3, 3.75, 4.5, 5.5, 7, 9, 12, 16, 21, 27, 34,
 ];
 /** Half the width of a crater across the road, and of the road itself. */
 const CRATER_HALF = 3.2;
@@ -37,35 +37,38 @@ function dunes(x: number, z: number): number {
   return away * (swell + 0.6);
 }
 
-/** The terrain's height: the course's craters across the road, dunes beyond. */
-export function terrainHeight(course: Course, x: number, z: number): number {
-  const across = Math.max(0, 1 - (z / CRATER_HALF) ** 2);
-  return groundHeight(course, x) * across + dunes(x, z);
+/** How much of a crater's dip reaches `z` across the road. */
+function across(z: number): number {
+  return Math.max(0, 1 - (z / CRATER_HALF) ** 2);
 }
 
-function dustColour(course: Course, x: number, z: number, out: THREE.Color): void {
-  const base = new THREE.Color(MARS.dust);
-  const speck = hash(Math.floor(x * 2), Math.floor(z * 2));
-  base.lerp(
-    new THREE.Color(speck > 0.5 ? MARS.dustLight : MARS.dustDark),
-    Math.abs(speck - 0.5) * 0.5,
-  );
-  const depth = Math.min(1, -groundHeight(course, x) * Math.max(0, 1 - Math.abs(z) / CRATER_HALF));
-  out.copy(base.lerp(new THREE.Color(MARS.craterFloor), depth * 0.8));
+/** The terrain's height: the course's craters across the road, dunes beyond. */
+export function terrainHeight(course: Course, x: number, z: number): number {
+  return groundHeight(course, x) * across(z) + dunes(x, z);
+}
+
+function dustColour(dip: number, x: number, z: number, out: THREE.Color): void {
+  const base = out.set(MARS.dust);
+  const speck = Math.sin(x * 1.7 + z * 2.3) * Math.sin(x * 0.6 - z * 1.1);
+  base.lerp(new THREE.Color(speck > 0 ? MARS.dustLight : MARS.dustDark), Math.abs(speck) * 0.25);
+  const depth = Math.min(1, -dip * Math.max(0, 1 - Math.abs(z) / CRATER_HALF));
+  base.lerp(new THREE.Color(MARS.craterFloor), depth * 0.8);
 }
 
 function chunkGeometry(course: Course, from: number): THREE.BufferGeometry {
   const columns = Math.round(CHUNK / COLUMN) + 1;
+  const xs = Array.from({ length: columns }, (_, c) => from + c * COLUMN);
+  const dips = xs.map((x) => groundHeight(course, x));
   const positions: number[] = [];
   const colours: number[] = [];
   const colour = new THREE.Color();
   for (const z of ROWS) {
-    for (let c = 0; c < columns; c++) {
-      const x = from + c * COLUMN;
-      positions.push(x, terrainHeight(course, x, z), z);
-      dustColour(course, x, z, colour);
+    xs.forEach((x, c) => {
+      const dip = dips[c] ?? 0;
+      positions.push(x, dip * across(z) + dunes(x, z), z);
+      dustColour(dip, x, z, colour);
       colours.push(colour.r, colour.g, colour.b);
-    }
+    });
   }
   const index: number[] = [];
   for (let r = 0; r < ROWS.length - 1; r++) {

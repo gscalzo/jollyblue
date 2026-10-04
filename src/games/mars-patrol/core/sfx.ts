@@ -19,7 +19,17 @@ export interface Tone {
 }
 
 export type SfxName =
-  'start' | 'jump' | 'land' | 'crash' | 'checkpoint' | 'extra' | 'clear' | 'over';
+  | 'start'
+  | 'jump'
+  | 'land'
+  | 'fire'
+  | 'hit'
+  | 'break'
+  | 'crash'
+  | 'checkpoint'
+  | 'extra'
+  | 'clear'
+  | 'over';
 
 function tone(wave: Wave, from: number, to: number, seconds: number, gain: number): Tone {
   return { wave, from, to, seconds, gain, delay: 0 };
@@ -33,6 +43,9 @@ export const SFX: Record<SfxName, Tone[]> = {
   start: arpeggio('triangle', [392, 523, 659, 784], 0.07, 0.25),
   jump: [tone('sine', 260, 720, 0.2, 0.25), tone('noise', 900, 2400, 0.15, 0.08)],
   land: [tone('noise', 500, 150, 0.14, 0.3), tone('sine', 110, 60, 0.12, 0.3)],
+  fire: [tone('square', 1500, 600, 0.09, 0.12), tone('sawtooth', 2400, 1300, 0.07, 0.08)],
+  hit: [tone('noise', 2600, 900, 0.1, 0.3), tone('triangle', 900, 500, 0.08, 0.15)],
+  break: [tone('noise', 1400, 120, 0.45, 0.45), tone('sine', 120, 45, 0.35, 0.3)],
   crash: [tone('noise', 1800, 90, 1.1, 0.5), tone('sawtooth', 140, 35, 0.9, 0.25)],
   checkpoint: arpeggio('triangle', [784, 1047], 0.09, 0.25),
   extra: arpeggio('square', [523, 659, 784, 1047, 1319], 0.06, 0.12),
@@ -44,6 +57,9 @@ const FOR: Partial<Record<GameEvent['kind'], SfxName>> = {
   start: 'start',
   jump: 'jump',
   land: 'land',
+  fire: 'fire',
+  hit: 'hit',
+  break: 'break',
   crash: 'crash',
   checkpoint: 'checkpoint',
   'extra-life': 'extra',
