@@ -1,5 +1,5 @@
 /**
- * Moon Patrol 3D — the stub (ADR-0005). The real game is designed later;
+ * Mars Patrol 3D — the stub (ADR-0005). The real game is designed later;
  * this proves the contract end to end: it mounts on its own canvas, reads
  * the shared input, sends a test score on Action, and is unmounted by Back.
  */
@@ -25,7 +25,7 @@ function paint(ctx: CanvasRenderingContext2D, t: number, line: string): void {
   ctx.textAlign = 'center';
   ctx.font = TYPE.marquee;
   ctx.fillStyle = INK.pink;
-  ctx.fillText('MOON PATROL 3D', W / 2, 30);
+  ctx.fillText('MARS PATROL 3D', W / 2, 30);
   ctx.font = TYPE.screen;
   ctx.fillStyle = INK.white;
   ctx.fillText('COMING SOON', W / 2, 48);

@@ -20,3 +20,7 @@ records use `template.md`.
 | 0013 | [The hall owns Back; runs are recorded under the owner's initials](0013-the-hall-owns-back-and-the-owners-initials.md) |
 | 0014 | [sharp snaps the generated art to pixels; the first art set](0014-sharp-snaps-the-art.md)                              |
 | 0015 | [One Lyria chiptune for the hall instead of synthesised jingles](0015-one-lyria-chiptune-for-the-hall.md)              |
+| 0016 | [The first game is Mars Patrol 3D, a homage under its own name](0016-mars-patrol-3d.md)                                |
+| 0017 | [Mars Patrol 3D's design: side-on, one lane, depth that warns](0017-mars-patrol-design.md)                             |
+| 0018 | [The games are shiny and modern; the hall stays low-res](0018-games-are-shiny.md)                                      |
+| 0019 | [Each game's core joins the logic core](0019-game-cores-in-the-logic-core.md)                                          |

@@ -24,7 +24,7 @@ describe('app', () => {
       throw boom;
     });
     const log = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    const res = await t.call('GET', '/api/scores/moon-patrol-3d');
+    const res = await t.call('GET', '/api/scores/mars-patrol-3d');
     expect(res.status).toBe(500);
     expect(await res.json()).toEqual({ error: 'internal error' });
     expect(log).toHaveBeenCalledWith(boom);

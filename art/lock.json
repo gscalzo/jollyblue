@@ -1,6 +1,4 @@
 {
-  "marquee-moon-patrol": "d661b92c1de3d800",
-  "side-moon-patrol": "8ca8f4f4d7004beb",
   "marquee-lava-llama": "738c9d3dff972e4e",
   "side-lava-llama": "fa79c8257f660329",
   "marquee-turbo-nonna": "05cbc8bd28d0bf37",
@@ -23,5 +21,7 @@
   "poster-high-score": "eb542275a0fd4688",
   "poster-insert-coin": "ca2f8509506445a9",
   "poster-game-over": "f7d45d9bbb78ba53",
-  "music:hall": "15c3a27a0f64ebd8"
+  "music:hall": "15c3a27a0f64ebd8",
+  "marquee-mars-patrol": "70a94df0ece7c893",
+  "side-mars-patrol": "6edd4b14b5bb4b29"
 }

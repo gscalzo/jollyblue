@@ -11,7 +11,7 @@ const GAME_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const GAME_ID_MAX = 32;
 const INITIALS = /^[A-Z]{3}$/;
 
-/** A game id is a short kebab-case slug, e.g. `moon-patrol-3d`. */
+/** A game id is a short kebab-case slug, e.g. `mars-patrol-3d`. */
 export function isGameId(value: string): boolean {
   return value.length <= GAME_ID_MAX && GAME_ID.test(value);
 }

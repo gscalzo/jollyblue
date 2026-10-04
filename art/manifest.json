@@ -3,16 +3,16 @@
   "style": "pixel art, 16-bit video game style, crisp limited palette, flat shading, no blur, no photo",
   "items": [
     {
-      "id": "marquee-moon-patrol",
-      "prompt": "arcade cabinet marquee banner, the game title \"MOON PATROL 3D\", with the big \"3D\" clearly part of the logo in big bold chunky retro 80s arcade logo lettering, small illustration of a six-wheeled moon buggy jumping over a crater under a huge earth, deep blue night beside the title, glowing, black background, wide banner",
+      "id": "marquee-mars-patrol",
+      "prompt": "arcade cabinet marquee banner, the game title \"MARS PATROL 3D\" spelled exactly M-A-R-S P-A-T-R-O-L 3-D, with the big \"3D\" clearly part of the logo, in big bold chunky retro 80s arcade logo lettering, no other text, small illustration of a six-wheeled rover buggy jumping over a crater on the red desert of Mars under two small moons, dusky orange sky beside the title, glowing, black background, wide banner",
       "generate": [1024, 256],
       "size": [128, 32],
       "colours": 24,
-      "seed": 500
+      "seed": 527
     },
     {
-      "id": "side-moon-patrol",
-      "prompt": "arcade cabinet side art, tall vertical panel illustration of a six-wheeled moon buggy jumping over a crater under a huge earth, deep blue night, bold shapes, strong outlines, vivid colours, no text",
+      "id": "side-mars-patrol",
+      "prompt": "arcade cabinet side art, tall vertical panel illustration of a six-wheeled rover buggy jumping over a crater on the red desert of Mars under two small moons, dusky orange sky, bold shapes, strong outlines, vivid colours, no text",
       "generate": [512, 1024],
       "size": [48, 96],
       "colours": 20,

@@ -4,7 +4,7 @@ import type { ScoreTable } from '../shared/types';
 import { createTestApp } from './test/harness';
 import type { TestApp } from './test/harness';
 
-const GAME = '/api/scores/moon-patrol-3d';
+const GAME = '/api/scores/mars-patrol-3d';
 
 async function table(t: TestApp): Promise<ScoreTable> {
   return (await t.call('GET', GAME)).json<ScoreTable>();
@@ -14,7 +14,7 @@ describe('scores', () => {
   it('starts empty', async () => {
     const res = await createTestApp().call('GET', GAME);
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ game: 'moon-patrol-3d', scores: [] });
+    expect(await res.json()).toEqual({ game: 'mars-patrol-3d', scores: [] });
   });
 
   it('records a run on the clock and answers 201 with it', async () => {
@@ -23,7 +23,7 @@ describe('scores', () => {
     expect(res.status).toBe(201);
     expect(await res.json()).toEqual({ initials: 'GIO', score: 4200, playedAt: 1000 });
     expect(await (await t.call('GET', GAME)).json()).toEqual({
-      game: 'moon-patrol-3d',
+      game: 'mars-patrol-3d',
       scores: [{ initials: 'GIO', score: 4200, playedAt: 1000 }],
     });
   });
@@ -74,7 +74,7 @@ describe('scores', () => {
       ['POST', runs[0]],
       ['GET', runs[1]],
     ] as const) {
-      const res = await t.call(method, '/api/scores/Moon', body);
+      const res = await t.call(method, '/api/scores/Mars', body);
       expect(res.status).toBe(400);
       expect(await res.json()).toEqual({ error: 'unknown game id' });
     }

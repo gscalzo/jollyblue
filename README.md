@@ -5,7 +5,7 @@
 ### An 8-bit arcade hall you can walk into.
 
 A private sala giochi in an isometric 3D world. Walk up to a cabinet, press
-Action, and the camera dives into the screen. The first game is Moon Patrol 3D.
+Action, and the camera dives into the screen. The first game is Mars Patrol 3D.
 
 [![CI](https://github.com/gscalzo/jollyblue/actions/workflows/ci.yml/badge.svg)](https://github.com/gscalzo/jollyblue/actions/workflows/ci.yml)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)
@@ -30,6 +30,23 @@ Each step is its own merge to `main`, deployed and visible:
    the full game contract with a stub Moon Patrol posting a fake score.
 5. **Life** — fal art, attract loops, the high-score table, sound — now
    one Lyria chiptune for the hall (ADR-0015).
+
+### Mars Patrol 3D
+
+The first game (ADR-0016–0019): a shiny 3D homage to the 1982 moon-buggy
+arcade game, set on Mars. Each slice is again its own merge to `main`:
+
+1. **Mars** — the rename, the cabinet's new art, the design records, the
+   gate globs for game cores. The stub still runs.
+2. **Drive** — the core simulation and the scene: the buggy, the speed
+   lever, jumps, craters through A–E, death, respawn and lives, the title,
+   the HUD, the results, the score posted; the game's audio through the
+   hall's graph, with jump, landing and crash sounds.
+3. **Guns** — small and big rocks, the forward and upward shots, the full
+   scoring, the checkpoint time bonus, extra lives.
+4. **UFOs** — the approach from depth, bombs and their shadows, bomb
+   craters, D and E tuned.
+5. **Music** — the game's own Lyria track.
 
 The decisions are in [`docs/adr/`](docs/adr/README.md).
 

@@ -3,20 +3,20 @@ import { isGameId, MAX_SCORE, parseNewScore } from './scores';
 
 describe('isGameId', () => {
   it('accepts short kebab-case slugs', () => {
-    expect(isGameId('moon-patrol-3d')).toBe(true);
+    expect(isGameId('mars-patrol-3d')).toBe(true);
     expect(isGameId('a')).toBe(true);
     expect(isGameId('a'.repeat(32))).toBe(true);
   });
   it('rejects anything else', () => {
     expect(isGameId('')).toBe(false);
     expect(isGameId('a'.repeat(33))).toBe(false);
-    expect(isGameId('Moon')).toBe(false);
-    expect(isGameId('-moon')).toBe(false);
-    expect(isGameId('moon-')).toBe(false);
-    expect(isGameId('moon--patrol')).toBe(false);
-    expect(isGameId('moon patrol')).toBe(false);
-    expect(isGameId('x/moon')).toBe(false);
-    expect(isGameId('moon/x')).toBe(false);
+    expect(isGameId('Mars')).toBe(false);
+    expect(isGameId('-mars')).toBe(false);
+    expect(isGameId('mars-')).toBe(false);
+    expect(isGameId('mars--patrol')).toBe(false);
+    expect(isGameId('mars patrol')).toBe(false);
+    expect(isGameId('x/mars')).toBe(false);
+    expect(isGameId('mars/x')).toBe(false);
   });
 });
 

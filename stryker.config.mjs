@@ -18,6 +18,7 @@ export default {
     'shared/**/*.ts',
     'worker/**/*.ts',
     'src/core/**/*.ts',
+    'src/games/*/core/**/*.ts',
     '!**/*.test.ts',
     '!**/*.d.ts',
     '!shared/types.ts',

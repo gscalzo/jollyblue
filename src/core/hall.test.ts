@@ -33,7 +33,7 @@ describe('validateHall', () => {
   it("passes JollyBlue's hall", () => {
     expect(validateHall(HALL)).toEqual([]);
     expect(HALL.cabinets.filter((c) => c.game !== undefined).map((c) => c.game)).toEqual([
-      'moon-patrol-3d',
+      'mars-patrol-3d',
     ]);
   });
 
@@ -56,7 +56,7 @@ describe('validateHall', () => {
   });
 
   it('finds a bad game id', () => {
-    expect(validateHall(hall([cabinet({ game: 'Moon Patrol' })]))).toEqual([
+    expect(validateHall(hall([cabinet({ game: 'Mars Patrol' })]))).toEqual([
       'a names a bad game id',
     ]);
   });

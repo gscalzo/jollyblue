@@ -21,7 +21,7 @@ import {
 } from './session';
 import type { Session } from './session';
 
-const moon = HALL.cabinets.find((c) => c.game !== undefined) as Cabinet;
+const mars = HALL.cabinets.find((c) => c.game !== undefined) as Cabinet;
 const dud = HALL.cabinets.find((c) => c.game === undefined) as Cabinet;
 const none = presses(IDLE, IDLE);
 const action = { ...none, action: true };
@@ -29,9 +29,9 @@ const back = { ...none, back: true };
 
 describe('cabinetInReach', () => {
   it('finds the cabinet whose play spot you stand on, within reach only', () => {
-    const spot = usePoint(moon);
-    expect(cabinetInReach(HALL, spot)).toBe(moon);
-    expect(cabinetInReach(HALL, { x: spot.x + REACH - 0.01, z: spot.z })).toBe(moon);
+    const spot = usePoint(mars);
+    expect(cabinetInReach(HALL, spot)).toBe(mars);
+    expect(cabinetInReach(HALL, { x: spot.x + REACH - 0.01, z: spot.z })).toBe(mars);
     expect(cabinetInReach(HALL, { x: spot.x + REACH, z: spot.z })).toBeNull();
     expect(cabinetInReach(HALL, HALL.spawn)).toBeNull();
   });
@@ -50,7 +50,7 @@ describe('cabinetInReach', () => {
 
 describe('press', () => {
   it('dives into a cabinet with a game', () => {
-    expect(press(IN_HALL, moon, action)).toEqual({ kind: 'entering', cabinet: moon, t: 0 });
+    expect(press(IN_HALL, mars, action)).toEqual({ kind: 'entering', cabinet: mars, t: 0 });
   });
   it('shows OUT OF ORDER at a cabinet without one, even over another notice', () => {
     const notice = { kind: 'notice', cabinet: dud, left: NOTICE_SECONDS } as const;
@@ -59,19 +59,19 @@ describe('press', () => {
   });
   it('ignores action away from cabinets, and without a press', () => {
     expect(press(IN_HALL, null, action)).toBe(IN_HALL);
-    expect(press(IN_HALL, moon, none)).toBe(IN_HALL);
-    expect(press(IN_HALL, moon, back)).toBe(IN_HALL);
+    expect(press(IN_HALL, mars, none)).toBe(IN_HALL);
+    expect(press(IN_HALL, mars, back)).toBe(IN_HALL);
   });
   it('ignores action while diving or playing', () => {
-    const entering: Session = { kind: 'entering', cabinet: moon, t: 0.5 };
-    expect(press(entering, moon, action)).toBe(entering);
-    const playing: Session = { kind: 'playing', cabinet: moon };
-    expect(press(playing, moon, action)).toBe(playing);
+    const entering: Session = { kind: 'entering', cabinet: mars, t: 0.5 };
+    expect(press(entering, mars, action)).toBe(entering);
+    const playing: Session = { kind: 'playing', cabinet: mars };
+    expect(press(playing, mars, action)).toBe(playing);
   });
   it('leaves a game on back', () => {
-    expect(press({ kind: 'playing', cabinet: moon }, null, back)).toEqual({
+    expect(press({ kind: 'playing', cabinet: mars }, null, back)).toEqual({
       kind: 'leaving',
-      cabinet: moon,
+      cabinet: mars,
       t: 0,
     });
   });
@@ -79,12 +79,12 @@ describe('press', () => {
 
 describe('leave', () => {
   it('only leaves a game being played', () => {
-    expect(leave({ kind: 'playing', cabinet: moon })).toEqual({
+    expect(leave({ kind: 'playing', cabinet: mars })).toEqual({
       kind: 'leaving',
-      cabinet: moon,
+      cabinet: mars,
       t: 0,
     });
-    const entering: Session = { kind: 'entering', cabinet: moon, t: 0.2 };
+    const entering: Session = { kind: 'entering', cabinet: mars, t: 0.2 };
     expect(leave(entering)).toBe(entering);
   });
 });
@@ -96,18 +96,18 @@ describe('advance', () => {
     expect(advance(notice, 1)).toBe(IN_HALL);
   });
   it('dives in over DIVE_SECONDS, then plays', () => {
-    const entering: Session = { kind: 'entering', cabinet: moon, t: 0 };
+    const entering: Session = { kind: 'entering', cabinet: mars, t: 0 };
     expect(advance(entering, DIVE_SECONDS / 2)).toEqual({ ...entering, t: 0.5 });
-    expect(advance(entering, DIVE_SECONDS)).toEqual({ kind: 'playing', cabinet: moon });
+    expect(advance(entering, DIVE_SECONDS)).toEqual({ kind: 'playing', cabinet: mars });
   });
   it('comes back out over DIVE_SECONDS, then walks', () => {
-    const leaving: Session = { kind: 'leaving', cabinet: moon, t: 0 };
+    const leaving: Session = { kind: 'leaving', cabinet: mars, t: 0 };
     expect(advance(leaving, DIVE_SECONDS / 4)).toEqual({ ...leaving, t: 0.25 });
     expect(advance(leaving, DIVE_SECONDS)).toBe(IN_HALL);
   });
   it('leaves the hall and a game in play as they are', () => {
     expect(advance(IN_HALL, 1)).toBe(IN_HALL);
-    const playing: Session = { kind: 'playing', cabinet: moon };
+    const playing: Session = { kind: 'playing', cabinet: mars };
     expect(advance(playing, 1)).toBe(playing);
   });
 });
@@ -116,9 +116,9 @@ describe('canWalk', () => {
   it('walks in the hall and past a notice, not while diving or playing', () => {
     expect(canWalk(IN_HALL)).toBe(true);
     expect(canWalk({ kind: 'notice', cabinet: dud, left: 1 })).toBe(true);
-    expect(canWalk({ kind: 'entering', cabinet: moon, t: 0 })).toBe(false);
-    expect(canWalk({ kind: 'playing', cabinet: moon })).toBe(false);
-    expect(canWalk({ kind: 'leaving', cabinet: moon, t: 0 })).toBe(false);
+    expect(canWalk({ kind: 'entering', cabinet: mars, t: 0 })).toBe(false);
+    expect(canWalk({ kind: 'playing', cabinet: mars })).toBe(false);
+    expect(canWalk({ kind: 'leaving', cabinet: mars, t: 0 })).toBe(false);
   });
 });
 
@@ -134,17 +134,17 @@ describe('ease and dive', () => {
   it('follows the session into the screen and back', () => {
     expect(dive(IN_HALL)).toBe(0);
     expect(dive({ kind: 'notice', cabinet: dud, left: 1 })).toBe(0);
-    expect(dive({ kind: 'entering', cabinet: moon, t: 0.25 })).toBeCloseTo(0.15625);
-    expect(dive({ kind: 'playing', cabinet: moon })).toBe(1);
-    expect(dive({ kind: 'leaving', cabinet: moon, t: 0.25 })).toBeCloseTo(0.84375);
+    expect(dive({ kind: 'entering', cabinet: mars, t: 0.25 })).toBeCloseTo(0.15625);
+    expect(dive({ kind: 'playing', cabinet: mars })).toBe(1);
+    expect(dive({ kind: 'leaving', cabinet: mars, t: 0.25 })).toBeCloseTo(0.84375);
   });
 });
 
 describe('handover', () => {
-  const playing: Session = { kind: 'playing', cabinet: moon };
+  const playing: Session = { kind: 'playing', cabinet: mars };
   it('starts the game as the dive ends and stops it as the player leaves', () => {
-    expect(handover({ kind: 'entering', cabinet: moon, t: 0.9 }, playing)).toEqual({ start: moon });
-    expect(handover(playing, { kind: 'leaving', cabinet: moon, t: 0 })).toEqual({ stop: moon });
+    expect(handover({ kind: 'entering', cabinet: mars, t: 0.9 }, playing)).toEqual({ start: mars });
+    expect(handover(playing, { kind: 'leaving', cabinet: mars, t: 0 })).toEqual({ stop: mars });
   });
   it('does nothing otherwise', () => {
     expect(handover(playing, playing)).toBeNull();
@@ -154,8 +154,8 @@ describe('handover', () => {
 
 describe('prompt', () => {
   it('invites play at a game, names a dud, and says OUT OF ORDER', () => {
-    expect(prompt(IN_HALL, moon)).toBe('PLAY MOON PATROL 3D — E / A');
-    expect(prompt(IN_HALL, moon, 'HI 900 GIO')).toBe('PLAY MOON PATROL 3D — HI 900 GIO — E / A');
+    expect(prompt(IN_HALL, mars)).toBe('PLAY MARS PATROL 3D — E / A');
+    expect(prompt(IN_HALL, mars, 'HI 900 GIO')).toBe('PLAY MARS PATROL 3D — HI 900 GIO — E / A');
     expect(prompt(IN_HALL, dud, 'HI 900 GIO')).toBe(`${dud.title} — E / A`);
     expect(prompt(IN_HALL, dud)).toBe(`${dud.title} — E / A`);
     expect(prompt({ kind: 'notice', cabinet: dud, left: 1 }, null)).toBe(
@@ -164,7 +164,7 @@ describe('prompt', () => {
   });
   it('is silent away from cabinets and outside the hall', () => {
     expect(prompt(IN_HALL, null)).toBeNull();
-    expect(prompt({ kind: 'playing', cabinet: moon }, moon)).toBeNull();
+    expect(prompt({ kind: 'playing', cabinet: mars }, mars)).toBeNull();
   });
 });
 

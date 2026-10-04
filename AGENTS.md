@@ -2,7 +2,7 @@
 
 A private arcade hall for one owner: you walk an isometric 3D world with an
 8-bit, _A Short Hike_ look, and play the games on its cabinets. The first
-game is Moon Patrol 3D. Read `docs/adr/README.md` before non-trivial work.
+game is Mars Patrol 3D (ADR-0016). Read `docs/adr/README.md` before non-trivial work.
 
 ## The ADR rule
 
@@ -20,9 +20,10 @@ silent change.
   duplication, dead code. Then `npm run mutation` for the mutation gate. CI
   runs all of it on every push (ADR-0008).
 - Coverage and mutation hold the logic core (`shared/`, `worker/`,
-  `src/core/`) at 100 %. Rendering (`src/render/`) and `src/main.ts` are
-  outside that set: keep them thin, move anything with a branch into
-  `src/core/`.
+  `src/core/`, every `src/games/*/core/`) at 100 %. Rendering
+  (`src/render/`, a game's `render/`), `src/main.ts` and a game's
+  `index.ts` are outside that set: keep them thin, move anything with a
+  branch into a `core/` (ADR-0019).
 - Never weaken a threshold or exclude files from a gate without a
   superseding record.
 - Design (ADR-0002): scene colours and render knobs come from
@@ -49,8 +50,9 @@ silent change.
   run against the real migrations through `worker/test/fake-d1.ts`
 - `src/` — the hall: `core/` (tested logic: geometry, hall data, input,
   avatar, session, game contract, music loop, scoreboard, pixel font),
-  `render/` (Three.js and the DOM overlays), `games/` (one module per game,
-  registered in `games/index.ts`), the wiring (`main.ts`, `devices.ts`,
+  `render/` (Three.js and the DOM overlays), `games/` (one folder per game,
+  `core/` + `render/` + `index.ts`, registered in `games/index.ts`; games are
+  full-resolution and shiny, ADR-0018), the wiring (`main.ts`, `devices.ts`,
   `sound.ts`, `scorebook.ts`, `game-slot.ts`), `palette.ts`, `styles.css`
 - `art/manifest.json` — the art recipes; `public/art/` — the committed PNGs;
   regenerate with `node scripts/generate-art.mjs` (needs `FAL_KEY`)

@@ -83,20 +83,20 @@ export function validateHall(hall: Hall): string[] {
   return errors;
 }
 
-/** JollyBlue's hall. You start in the top corner, under the sign; Moon Patrol 3D stands on the island. */
+/** JollyBlue's hall. You start in the top corner, under the sign; Mars Patrol 3D stands on the island. */
 export const HALL: Hall = {
   width: 16,
   depth: 12,
   spawn: { x: 1.5, z: 1.6 },
   cabinets: [
     {
-      id: 'moon-patrol',
-      title: 'MOON PATROL 3D',
+      id: 'mars-patrol',
+      title: 'MARS PATROL 3D',
       position: { x: 9, z: 6.5 },
       facing: 'south',
       livery: 'midnight',
       attract: 'starfield',
-      game: 'moon-patrol-3d',
+      game: 'mars-patrol-3d',
     },
     {
       id: 'lava-llama',
