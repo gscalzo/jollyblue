@@ -87,11 +87,11 @@ export function validateHall(hall: Hall): string[] {
   return errors;
 }
 
-/** JollyBlue's hall. Moon Patrol 3D stands on the island, nearest the door. */
+/** JollyBlue's hall. You start in the top corner, under the sign; Moon Patrol 3D stands on the island. */
 export const HALL: Hall = {
   width: 16,
   depth: 12,
-  spawn: { x: 12.5, z: 10 },
+  spawn: { x: 1.5, z: 1.6 },
   cabinets: [
     {
       id: 'moon-patrol',

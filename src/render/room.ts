@@ -86,7 +86,8 @@ function neonTubes(hall: Hall): THREE.Group {
   return group;
 }
 
-function sign(hall: Hall): THREE.Mesh {
+/** A JOLLYBLUE sign flat on a back wall; `onWest` turns it to face east. */
+function sign(x: number, z: number, onWest: boolean): THREE.Mesh {
   const { ctx, texture } = pixelCanvas(96, 20);
   ctx.fillStyle = INK.screenBlack;
   ctx.fillRect(0, 0, 96, 20);
@@ -99,7 +100,8 @@ function sign(hall: Hall): THREE.Mesh {
     new THREE.PlaneGeometry(3.6, 0.75),
     new THREE.MeshBasicMaterial({ map: texture }),
   );
-  mesh.position.set(hall.width - 3, 2.2, 0.02);
+  mesh.position.set(x, 2.2, z);
+  if (onWest) mesh.rotation.y = Math.PI / 2;
   return mesh;
 }
 
@@ -124,7 +126,7 @@ function lights(hall: Hall): THREE.Group {
 /** Posters on the back walls: [art id, x, z, facing east (on the west wall)]. */
 const POSTERS: [string, number, number, boolean][] = [
   ['poster-high-score', 1.4, 0.02, false],
-  ['poster-insert-coin', 0.02, 2.1, true],
+  ['poster-insert-coin', 15.4, 0.02, false],
   ['poster-game-over', 0.02, 10, true],
 ];
 
@@ -144,6 +146,8 @@ function posters(): THREE.Group {
 /** Everything that does not move: the room and its lights. */
 export function buildRoom(hall: Hall): THREE.Group {
   const room = new THREE.Group();
-  room.add(floor(hall), walls(hall), neonTubes(hall), sign(hall), posters(), lights(hall));
+  room.add(floor(hall), walls(hall), neonTubes(hall), posters(), lights(hall));
+  // One sign over the far end of the north wall, one in the top corner where you start.
+  room.add(sign(hall.width - 3, 0.02, false), sign(0.02, 1.85, true));
   return room;
 }
