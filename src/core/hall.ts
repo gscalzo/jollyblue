@@ -5,7 +5,6 @@
  */
 import type { Livery } from '../palette';
 import { isGameId } from '../../shared/scores';
-import { parseJingle } from './audio';
 import { add, facingVector, footprint, rectContains, rectsOverlap, scale } from './geometry';
 import type { Facing, Rect, Vec2 } from './geometry';
 
@@ -20,8 +19,6 @@ export interface Cabinet {
   facing: Facing;
   livery: Livery;
   attract: AttractStyle;
-  /** Attract-mode jingle in note names, `.` a rest (ADR-0010). */
-  jingle: string;
   game?: string;
 }
 
@@ -65,7 +62,6 @@ function cabinetErrors(hall: Hall, cabinet: Cabinet, index: number): string[] {
   if (!rectContains(room, pointRect(usePoint(cabinet)))) {
     errors.push(`${cabinet.id} faces a wall`);
   }
-  if (parseJingle(cabinet.jingle) === null) errors.push(`${cabinet.id} has a bad jingle`);
   if (cabinet.game !== undefined && !isGameId(cabinet.game)) {
     errors.push(`${cabinet.id} names a bad game id`);
   }
@@ -100,7 +96,6 @@ export const HALL: Hall = {
       facing: 'south',
       livery: 'midnight',
       attract: 'starfield',
-      jingle: 'C5 E5 G5 C6 . G5 E5 . D5 F5 A5 D6 . A5 F5 .',
       game: 'moon-patrol-3d',
     },
     {
@@ -110,7 +105,6 @@ export const HALL: Hall = {
       facing: 'south',
       livery: 'tangerine',
       attract: 'bounce',
-      jingle: 'E4 G4 B4 . E5 . B4 G4 A4 C5 E5 . A5 . E5 C5',
     },
     {
       id: 'turbo-nonna',
@@ -119,7 +113,6 @@ export const HALL: Hall = {
       facing: 'south',
       livery: 'cherry',
       attract: 'tunnel',
-      jingle: 'G4 G4 D5 D5 E5 E5 D5 . C5 C5 B4 B4 A4 A4 G4 .',
     },
     {
       id: 'star-gardener',
@@ -128,7 +121,6 @@ export const HALL: Hall = {
       facing: 'south',
       livery: 'lime',
       attract: 'rain',
-      jingle: 'A4 C5 E5 A5 G5 E5 C5 . F4 A4 C5 F5 E5 C5 A4 .',
     },
     {
       id: 'pixel-piranha',
@@ -137,7 +129,6 @@ export const HALL: Hall = {
       facing: 'south',
       livery: 'teal',
       attract: 'snake',
-      jingle: 'D5 . D5 F5 . A5 . F5 D5 . C5 . A4 . C5 .',
     },
     {
       id: 'galaxy-gelato',
@@ -146,7 +137,6 @@ export const HALL: Hall = {
       facing: 'south',
       livery: 'bubblegum',
       attract: 'invaders',
-      jingle: 'C5 D5 E5 G5 E5 D5 C5 . E5 F5 G5 C6 G5 F5 E5 .',
     },
     {
       id: 'robo-rodeo',
@@ -155,7 +145,6 @@ export const HALL: Hall = {
       facing: 'south',
       livery: 'cobalt',
       attract: 'bounce',
-      jingle: 'E5 E5 . E5 . C5 E5 . G5 . . . G4 . . .',
     },
     {
       id: 'comet-kebab',
@@ -164,7 +153,6 @@ export const HALL: Hall = {
       facing: 'east',
       livery: 'grape',
       attract: 'starfield',
-      jingle: 'B4 D5 F5 B5 A5 F5 D5 . B4 E5 G5 B5 A5 G5 E5 .',
     },
     {
       id: 'disco-dungeon',
@@ -173,7 +161,6 @@ export const HALL: Hall = {
       facing: 'east',
       livery: 'bubblegum',
       attract: 'tunnel',
-      jingle: 'A4 . A5 . A4 . A5 . G4 . G5 . G4 . G5 .',
     },
     {
       id: 'yeti-yacht',
@@ -182,7 +169,6 @@ export const HALL: Hall = {
       facing: 'east',
       livery: 'teal',
       attract: 'rain',
-      jingle: 'F4 A4 C5 F5 . C5 A4 . G4 B4 D5 G5 . D5 B4 .',
     },
   ],
 };

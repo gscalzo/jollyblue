@@ -19,3 +19,4 @@ records use `template.md`.
 | 0012 | [The render smoke test builds the scene; WebGL is checked by eye](0012-render-smoke-test-builds-the-scene.md)          |
 | 0013 | [The hall owns Back; runs are recorded under the owner's initials](0013-the-hall-owns-back-and-the-owners-initials.md) |
 | 0014 | [sharp snaps the generated art to pixels; the first art set](0014-sharp-snaps-the-art.md)                              |
+| 0015 | [One Lyria chiptune for the hall instead of synthesised jingles](0015-one-lyria-chiptune-for-the-hall.md)              |

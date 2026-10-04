@@ -28,8 +28,8 @@ Each step is its own merge to `main`, deployed and visible:
    gamepad, colliding, the camera following.
 4. **Interaction** — highlight and prompt at a cabinet, "OUT OF ORDER", and
    the full game contract with a stub Moon Patrol posting a fake score.
-5. **Life** — fal art, attract loops, the high-score table, synthesised
-   sound.
+5. **Life** — fal art, attract loops, the high-score table, sound — now
+   one Lyria chiptune for the hall (ADR-0015).
 
 The decisions are in [`docs/adr/`](docs/adr/README.md).
 

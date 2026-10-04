@@ -24,7 +24,6 @@ const hall: Hall = {
       facing: 'south',
       livery: 'cobalt',
       attract: 'bounce',
-      jingle: 'C5',
     },
     {
       id: 'far',
@@ -33,7 +32,6 @@ const hall: Hall = {
       facing: 'south',
       livery: 'cobalt',
       attract: 'bounce',
-      jingle: 'C5',
     },
   ],
 };

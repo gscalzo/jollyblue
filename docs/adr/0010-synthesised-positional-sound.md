@@ -1,6 +1,6 @@
 # 0010 — Sound is synthesised in code and positional
 
-**Status:** accepted
+**Status:** superseded-by-0015
 **Date:** 2026-10-04
 
 ## Context

@@ -1,6 +1,6 @@
 # 0004 — The hall is data; the avatar is built from primitives
 
-**Status:** accepted
+**Status:** accepted; the jingle clause is superseded-by-0015
 **Date:** 2026-10-04
 
 ## Context

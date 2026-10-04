@@ -1,32 +1,22 @@
 /**
- * The Web Audio engine (ADR-0010): it plays what core/audio decides. Every
- * cabinet loops its jingle through its own panner and gain; footsteps,
- * the coin and the room hum are synthesised too. Nothing sounds until the
- * first key press (browser policy), and M toggles it, remembered per browser.
+ * The Web Audio engine (ADR-0015): one Lyria chiptune for the hall, looped
+ * with a crossfade and faded out while a game plays, plus soft synthesised
+ * footsteps and a coin. Nothing sounds until the first key press (browser
+ * policy), and M toggles it, remembered per browser.
  */
-import { hearing, loopOf, parseJingle, STEP_SECONDS } from './core/audio';
-import type { Vec2 } from './core/geometry';
-import type { Cabinet } from './core/hall';
+import { dueToStart, HALL_TRACK, loopPeriod } from './core/music';
 
-const LOOKAHEAD = 0.25;
-const JINGLE_VOLUME = 0.07;
+const LOOKAHEAD = 0.5;
+const MUSIC_VOLUME = 0.35;
+const STEP_VOLUME = 0.05;
+const COIN_VOLUME = 0.25;
 const MUTE_KEY = 'jollyblue.muted';
-
-interface Voice {
-  cabinet: Cabinet;
-  loop: (number | null)[];
-  wave: OscillatorType;
-  panner: StereoPannerNode;
-  gain: GainNode;
-  step: number;
-  at: number;
-}
 
 export interface Sound {
   /** Starts the engine; call from a user gesture. */
   unlock(): void;
-  /** Places the listener, schedules the jingles; `inGame` silences the hall. */
-  update(listener: Vec2, inGame: boolean): void;
+  /** Keeps the music looping; `inGame` fades it out. */
+  update(inGame: boolean): void;
   footstep(): void;
   coin(): void;
   toggleMute(): boolean;
@@ -50,19 +40,18 @@ function writeMuted(muted: boolean): void {
 }
 
 interface Blip {
-  wave: OscillatorType;
   hz: number;
   at: number;
   length: number;
 }
 
-function blip(ctx: AudioContext, out: AudioNode, { wave, hz, at, length }: Blip): void {
+function blip(ctx: AudioContext, out: AudioNode, { hz, at, length }: Blip): void {
   const osc = ctx.createOscillator();
   const env = ctx.createGain();
-  osc.type = wave;
+  osc.type = 'square';
   osc.frequency.value = hz;
   env.gain.setValueAtTime(0.0001, at);
-  env.gain.exponentialRampToValueAtTime(1, at + 0.01);
+  env.gain.exponentialRampToValueAtTime(COIN_VOLUME, at + 0.01);
   env.gain.exponentialRampToValueAtTime(0.0001, at + length);
   osc.connect(env).connect(out);
   osc.start(at);
@@ -70,59 +59,39 @@ function blip(ctx: AudioContext, out: AudioNode, { wave, hz, at, length }: Blip)
 }
 
 function noiseBuffer(ctx: AudioContext): AudioBuffer {
-  const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.08), ctx.sampleRate);
+  const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.06), ctx.sampleRate);
   const data = buffer.getChannelData(0);
   for (let i = 0; i < data.length; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
   return buffer;
 }
 
-function hum(ctx: AudioContext, out: AudioNode): void {
-  const osc = ctx.createOscillator();
-  const filter = ctx.createBiquadFilter();
-  const gain = ctx.createGain();
-  osc.type = 'sawtooth';
-  osc.frequency.value = 55;
-  filter.type = 'lowpass';
-  filter.frequency.value = 180;
-  gain.gain.value = 0.025;
-  osc.connect(filter).connect(gain).connect(out);
-  osc.start();
+/** One play of the track from its start to the loop point, faded in and out by the crossfade. */
+function playOnce(ctx: AudioContext, out: AudioNode, buffer: AudioBuffer, at: number): void {
+  const { loopEnd, crossfade } = HALL_TRACK;
+  const src = ctx.createBufferSource();
+  const env = ctx.createGain();
+  src.buffer = buffer;
+  env.gain.setValueAtTime(0, at);
+  env.gain.linearRampToValueAtTime(1, at + crossfade);
+  env.gain.setValueAtTime(1, at + loopEnd - crossfade);
+  env.gain.linearRampToValueAtTime(0, at + loopEnd);
+  src.connect(env).connect(out);
+  src.start(at, 0, loopEnd);
 }
 
-function voiceFor(ctx: AudioContext, out: AudioNode, cabinet: Cabinet, index: number): Voice {
-  const panner = ctx.createStereoPanner();
-  const gain = ctx.createGain();
-  gain.gain.value = 0;
-  panner.connect(gain).connect(out);
-  return {
-    cabinet,
-    loop: loopOf(parseJingle(cabinet.jingle) ?? []),
-    wave: index % 2 === 0 ? 'square' : 'triangle',
-    panner,
-    gain,
-    step: 0,
-    // Staggered, so the hall is a murmur rather than a choir.
-    at: ctx.currentTime + 0.3 + index * 0.41,
-  };
+async function loadTrack(ctx: AudioContext): Promise<AudioBuffer> {
+  const res = await fetch(HALL_TRACK.url);
+  if (!res.ok) throw new Error(`music answered ${res.status}`);
+  return ctx.decodeAudioData(await res.arrayBuffer());
 }
 
-function schedule(ctx: AudioContext, voice: Voice): void {
-  while (voice.at < ctx.currentTime + LOOKAHEAD) {
-    const hz = voice.loop[voice.step % voice.loop.length];
-    if (hz !== null) {
-      blip(ctx, voice.panner, { wave: voice.wave, hz, at: voice.at, length: STEP_SECONDS * 0.9 });
-    }
-    voice.step += 1;
-    voice.at += STEP_SECONDS;
-  }
-}
-
-export function createSound(cabinets: readonly Cabinet[]): Sound {
+export function createSound(): Sound {
   let ctx: AudioContext | null = null;
   let master: GainNode | null = null;
-  let hall: GainNode | null = null;
+  let music: GainNode | null = null;
   let noise: AudioBuffer | null = null;
-  let voices: Voice[] = [];
+  let track: AudioBuffer | null = null;
+  let nextStart = 0;
   let muted = readMuted();
 
   return {
@@ -131,45 +100,47 @@ export function createSound(cabinets: readonly Cabinet[]): Sound {
     },
     unlock() {
       if (ctx) return;
-      ctx = new AudioContext();
-      master = ctx.createGain();
+      const live = new AudioContext();
+      ctx = live;
+      master = live.createGain();
       master.gain.value = muted ? 0 : 1;
-      master.connect(ctx.destination);
-      hall = ctx.createGain();
-      hall.connect(master);
-      noise = noiseBuffer(ctx);
-      hum(ctx, hall);
-      const live = ctx;
-      const out = hall;
-      voices = cabinets.map((c, i) => voiceFor(live, out, c, i));
+      master.connect(live.destination);
+      music = live.createGain();
+      music.gain.value = MUSIC_VOLUME;
+      music.connect(master);
+      noise = noiseBuffer(live);
+      loadTrack(live)
+        .then((buffer) => {
+          track = buffer;
+          nextStart = live.currentTime + 0.1;
+        })
+        .catch(console.error);
     },
-    update(listener, inGame) {
-      if (!ctx || !hall) return;
-      hall.gain.setTargetAtTime(inGame ? 0 : 1, ctx.currentTime, 0.2);
-      for (const voice of voices) {
-        const heard = hearing(listener, voice.cabinet.position);
-        voice.gain.gain.setTargetAtTime(heard.gain * JINGLE_VOLUME, ctx.currentTime, 0.1);
-        voice.panner.pan.setTargetAtTime(heard.pan, ctx.currentTime, 0.1);
-        schedule(ctx, voice);
+    update(inGame) {
+      if (!ctx || !music) return;
+      music.gain.setTargetAtTime(inGame ? 0 : MUSIC_VOLUME, ctx.currentTime, 0.3);
+      if (track && dueToStart(nextStart, ctx.currentTime, LOOKAHEAD)) {
+        playOnce(ctx, music, track, nextStart);
+        nextStart += loopPeriod(HALL_TRACK);
       }
     },
     footstep() {
-      if (!ctx || !hall || !noise) return;
+      if (!ctx || !master || !noise) return;
       const src = ctx.createBufferSource();
       const filter = ctx.createBiquadFilter();
       const gain = ctx.createGain();
       src.buffer = noise;
       filter.type = 'bandpass';
-      filter.frequency.value = 900 + Math.random() * 300;
-      gain.gain.value = 0.12;
-      src.connect(filter).connect(gain).connect(hall);
+      filter.frequency.value = 700 + Math.random() * 200;
+      gain.gain.value = STEP_VOLUME;
+      src.connect(filter).connect(gain).connect(master);
       src.start();
     },
     coin() {
       if (!ctx || !master) return;
       const now = ctx.currentTime;
-      blip(ctx, master, { wave: 'square', hz: 1318.5, at: now, length: 0.07 });
-      blip(ctx, master, { wave: 'square', hz: 1760, at: now + 0.07, length: 0.25 });
+      blip(ctx, master, { hz: 1318.5, at: now, length: 0.07 });
+      blip(ctx, master, { hz: 1760, at: now + 0.07, length: 0.25 });
     },
     toggleMute() {
       muted = !muted;

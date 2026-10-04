@@ -55,7 +55,7 @@ function buildScene(root: HTMLElement) {
 function run(root: HTMLElement): void {
   const { stage, overlay, cabinets, body, screenOf } = buildScene(root);
   const devices = listenToDevices(window);
-  const sound = createSound(HALL.cabinets);
+  const sound = createSound();
   const book = createScoreBook(cabinets);
   const slot = createGameSlot(overlay.gameCanvas, devices, book);
   overlay.setMuted(sound.muted);
@@ -99,7 +99,7 @@ function run(root: HTMLElement): void {
   /** Everything the player sees and hears this frame. */
   const show = (near: Cabinet | null, ms: number, dt: number) => {
     const playing = session.kind === 'playing';
-    sound.update(avatar.position, playing);
+    sound.update(playing);
     body.update(avatar);
     focus = follow(focus, avatar.position, CAMERA_RATE, dt);
     for (const view of cabinets) {

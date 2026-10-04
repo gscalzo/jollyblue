@@ -9,7 +9,6 @@ const cabinet = (over: Partial<Cabinet> = {}): Cabinet => ({
   facing: 'south',
   livery: 'cobalt',
   attract: 'bounce',
-  jingle: 'C5',
   ...over,
 });
 
@@ -54,10 +53,6 @@ describe('validateHall', () => {
     expect(validateHall(hall([cabinet({ position: { x: 2, z: 9.5 }, facing: 'north' })]))).toEqual(
       [],
     );
-  });
-
-  it('finds a bad jingle', () => {
-    expect(validateHall(hall([cabinet({ jingle: 'C5 X9' })]))).toEqual(['a has a bad jingle']);
   });
 
   it('finds a bad game id', () => {
