@@ -65,3 +65,37 @@ export const POINTS = {
   clear: 5_000,
   perLife: 2_000,
 } as const;
+
+/** The UFOs (ADR-0017): they fly in from far behind the road, hover ahead and bomb. */
+export const UFO = {
+  /** Seconds to fly in from the distance, and to fly away. */
+  approach: 3,
+  leave: 3,
+  /** Where one appears, relative to the buggy: far back, high and ahead. */
+  startZ: -70,
+  startY: 18,
+  startAhead: 45,
+  hoverY: 7,
+  /** Metres per second faster or slower than cruise it moves to keep its station. */
+  chase: 3,
+  /** How far it sways while it hovers. */
+  swayX: 3,
+  swayY: 0.8,
+  /** How close an upward bolt must pass to bring one down. */
+  hitX: 1.4,
+  hitY: 0.8,
+  points: 300,
+} as const;
+
+export const BOMB = {
+  gravity: 9,
+  /** How close a bolt must pass to burst a bomb. */
+  hit: 0.6,
+  /** Metres beyond the buggy's ends a blast still reaches. */
+  blast: 0.4,
+  /** A blast only reaches a buggy lower than this. */
+  reach: 1,
+  /** The crater a missed bomb leaves in the road ahead. */
+  hole: 2.2,
+  points: 50,
+} as const;

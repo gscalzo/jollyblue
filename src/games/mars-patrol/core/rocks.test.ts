@@ -14,6 +14,7 @@ const COURSE: Course = {
     { x: 50, size: 'small' },
     { x: 100, size: 'big' },
   ],
+  ufos: [],
 };
 const FRESH = [0, 0];
 const buggyAt = (x: number, y = 0) => ({ ...startBuggy(x), y });

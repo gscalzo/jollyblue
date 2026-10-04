@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
+  changedCraters,
   checkpointX,
   CRATER_DEPTH,
   LANDING_ROOM,
   cratersBehind,
   finish,
   groundHeight,
-  inCrater,
+  inPit,
+  reaches,
   RESPAWN_ROOM,
   SECTION,
   validateCourse,
@@ -19,7 +21,7 @@ const START = { letter: 'A', x: 0, par: 0 };
 const END = { letter: 'B', x: 200, par: 30 };
 
 function course(craters: Crater[], checkpoints = [START, END], rocks: Rock[] = []): Course {
-  return { checkpoints, craters, rocks };
+  return { checkpoints, craters, rocks, ufos: [] };
 }
 
 describe('the section', () => {
@@ -161,15 +163,75 @@ describe('rocks in the course', () => {
   });
 });
 
+describe('UFO waves in the course', () => {
+  const wave = { at: 50, hover: 8, bombs: 3, every: 1.5 };
+  const withWaves = (ufos: (typeof wave)[]): Course => ({
+    checkpoints: [START, END],
+    craters: [],
+    rocks: [],
+    ufos,
+  });
+
+  it('accepts waves in order before the finish', () => {
+    expect(validateCourse(withWaves([wave, { ...wave, at: 50 }]))).toEqual([]);
+    expect(validateCourse(withWaves([{ ...wave, at: 199.9 }]))).toEqual([]);
+  });
+
+  it('rejects a malformed, unordered or late wave', () => {
+    for (const bad of [
+      { at: Number.NaN },
+      { hover: Number.NaN },
+      { bombs: Number.NaN },
+      { every: Number.NaN },
+      { hover: 0 },
+      { bombs: 0 },
+      { every: 0 },
+    ]) {
+      expect(validateCourse(withWaves([{ ...wave, ...bad }]))).toEqual(['wave 0 is malformed']);
+    }
+    expect(validateCourse(withWaves([{ ...wave, at: 0 }]))).toEqual([]);
+    expect(validateCourse(withWaves([wave, { ...wave, at: 49 }]))).toEqual([
+      'wave 1 comes before wave 0',
+    ]);
+    expect(validateCourse(withWaves([{ ...wave, at: 200 }]))).toEqual([
+      'wave 0 is past the finish',
+    ]);
+  });
+
+  it('sends the UFOs in the last stretch only', () => {
+    expect(SECTION.ufos.length).toBeGreaterThan(1);
+    expect(SECTION.ufos.every((w) => w.at > 900)).toBe(true);
+  });
+});
+
+describe('craters that change', () => {
+  const a = { x: 10, width: 2 };
+  const b = { x: 20, width: 2 };
+  const c = { x: 30, width: 2 };
+
+  it('lists the craters in one list and not the other', () => {
+    expect(changedCraters([a, b], [a, b])).toEqual([]);
+    expect(changedCraters([a], [a, b])).toEqual([b]);
+    expect(changedCraters([a, c], [a])).toEqual([c]);
+  });
+
+  it('knows which stretch of road a crater reaches into', () => {
+    expect(reaches(a, 12, 20)).toBe(true);
+    expect(reaches(a, 12.01, 20)).toBe(false);
+    expect(reaches(a, 0, 10)).toBe(true);
+    expect(reaches(a, 0, 9.99)).toBe(false);
+  });
+});
+
 describe('the ground', () => {
   const one = course([{ x: 50, width: 3 }]);
   const m = RULES.craterMargin;
 
   it('drops the buggy only inside the trimmed span', () => {
-    expect(inCrater(one, 50 + m)).toBe(false);
-    expect(inCrater(one, 50 + m + 0.01)).toBe(true);
-    expect(inCrater(one, 53 - m - 0.01)).toBe(true);
-    expect(inCrater(one, 53 - m)).toBe(false);
+    expect(inPit(one.craters, 50 + m)).toBe(false);
+    expect(inPit(one.craters, 50 + m + 0.01)).toBe(true);
+    expect(inPit(one.craters, 53 - m - 0.01)).toBe(true);
+    expect(inPit(one.craters, 53 - m)).toBe(false);
   });
 
   it('counts the craters wholly behind a point', () => {

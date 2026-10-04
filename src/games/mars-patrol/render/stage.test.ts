@@ -4,6 +4,7 @@ import { SECTION } from '../core/course';
 import { stepScreen, TITLE } from '../core/flow';
 import type { Screen } from '../core/flow';
 import { newRun } from '../core/run';
+import { launch } from '../core/ufo';
 import { buildStage } from './view';
 import { terrainHeight } from './world';
 
@@ -34,6 +35,36 @@ describe('the Mars Patrol stage builds (ADR-0012)', { timeout: 30_000 }, () => {
     }
     expect(stage.camera.position.z).toBeGreaterThan(5);
     expect(stage.buggy.root.visible).toBe(false);
+  });
+
+  it('poses saucers, bombs and the craters they blow', () => {
+    const stage = buildStage(SECTION);
+    const run = newRun(SECTION);
+    const ufo = {
+      ...launch(SECTION.ufos[0] ?? { at: 0, hover: 8, bombs: 1, every: 1 }, 0, 950),
+      phase: 'attack' as const,
+    };
+    const skies = {
+      ufos: [ufo],
+      bombs: [{ x: 955, y: 3, vy: -2 }],
+      holes: [{ x: 960, width: 2.2 }],
+      nextWave: 1,
+    };
+    const screen: Screen = {
+      kind: 'playing',
+      run: { ...run, buggy: { ...run.buggy, x: 950 }, skies },
+    };
+    stage.update(
+      screen,
+      [
+        { kind: 'ufo-down', x: 958, y: 7 },
+        { kind: 'impact', x: 960 },
+      ],
+      1 / 60,
+      1,
+    );
+    stage.update(screen, [], 1 / 60, 1.1);
+    expect(stage.world.scene.children.length).toBeGreaterThan(5);
   });
 
   it('dips the road where the course has a crater, and nowhere else on the line', () => {

@@ -6,8 +6,8 @@
  */
 import * as THREE from 'three';
 import { MARS, MARS_LOOK } from '../../../palette';
-import { groundHeight } from '../core/course';
-import type { Course } from '../core/course';
+import { changedCraters, groundHeight, reaches } from '../core/course';
+import type { Course, Crater } from '../core/course';
 import { buildRock } from './models';
 
 /** Metres of terrain per chunk, and how far the world runs past the course. */
@@ -86,15 +86,37 @@ function chunkGeometry(course: Course, from: number): THREE.BufferGeometry {
   return geometry;
 }
 
-function buildTerrain(course: Course, end: number): THREE.Group {
+interface Terrain {
+  group: THREE.Group;
+  /** Re-carves the chunks that bomb craters have changed. */
+  reshape(holes: readonly Crater[]): void;
+}
+
+function buildTerrain(course: Course, end: number): Terrain {
   const group = new THREE.Group();
   const material = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95 });
+  const chunks: { mesh: THREE.Mesh; from: number }[] = [];
   for (let from = -BEFORE; from < end + AFTER; from += CHUNK) {
-    const chunk = new THREE.Mesh(chunkGeometry(course, from), material);
-    chunk.receiveShadow = true;
-    group.add(chunk);
+    const mesh = new THREE.Mesh(chunkGeometry(course, from), material);
+    mesh.receiveShadow = true;
+    chunks.push({ mesh, from });
+    group.add(mesh);
   }
-  return group;
+  let shown: readonly Crater[] = [];
+  return {
+    group,
+    reshape(holes) {
+      if (holes === shown) return;
+      const changed = changedCraters(shown, holes);
+      shown = holes;
+      const carved = { ...course, craters: [...course.craters, ...holes] };
+      for (const chunk of chunks) {
+        if (!changed.some((c) => reaches(c, chunk.from, chunk.from + CHUNK))) continue;
+        chunk.mesh.geometry.dispose();
+        chunk.mesh.geometry = chunkGeometry(carved, chunk.from);
+      }
+    },
+  };
 }
 
 function scatter(end: number): THREE.Group {
@@ -294,6 +316,7 @@ function buildLights(): Lights {
 
 export interface World {
   scene: THREE.Scene;
+  terrain: Terrain;
   sky: Sky;
   lights: Lights;
 }
@@ -304,6 +327,6 @@ export function buildWorld(course: Course, end: number): World {
   const terrain = buildTerrain(course, end);
   const sky = buildSky();
   const lights = buildLights();
-  scene.add(sky.group, terrain, scatter(end), backdrop(end), domes(end), lights.group);
-  return { scene, sky, lights };
+  scene.add(sky.group, terrain.group, scatter(end), backdrop(end), domes(end), lights.group);
+  return { scene, terrain, sky, lights };
 }

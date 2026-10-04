@@ -3,7 +3,7 @@ import type { Course } from './course';
 import { finished, newRun, stepRun } from './run';
 import type { Controls, Run, RunEvent } from './run';
 import { checkpointBonus, clearBonus } from './scoring';
-import { DRIVE, GUNS, POINTS, ROCKS, RULES, STEP } from './tuning';
+import { DRIVE, GUNS, POINTS, ROCKS, RULES, STEP, UFO } from './tuning';
 
 const COURSE: Course = {
   checkpoints: [
@@ -13,6 +13,7 @@ const COURSE: Course = {
   ],
   craters: [{ x: 40, width: 3 }],
   rocks: [],
+  ufos: [],
 };
 
 const IDLE: Controls = { lever: 0, jump: false, fire: false };
@@ -182,6 +183,7 @@ describe('rocks and guns', () => {
       { x: 70, size: 'big' },
       { x: 150, size: 'small' },
     ],
+    ufos: [],
   };
   const FIRE: Controls = { ...IDLE, fire: true };
 
@@ -298,5 +300,99 @@ describe('rocks and guns', () => {
     const s = stepRun(ROCKY, crashed, IDLE);
     expect(s.run.damage).toEqual([1, 2, 0]);
     expect(s.run.guns).toEqual({ forward: null, up: [] });
+  });
+});
+
+describe('the sky over a run', () => {
+  const SKY: Course = {
+    checkpoints: [
+      { letter: 'A', x: 0, par: 0 },
+      { letter: 'B', x: 100, par: 20 },
+      { letter: 'C', x: 300, par: 20 },
+    ],
+    craters: [],
+    rocks: [],
+    ufos: [{ at: 120, hover: 8, bombs: 3, every: 1 }],
+  };
+  const placed = (x: number) => {
+    const run = newRun(SKY);
+    return { ...run, buggy: { ...run.buggy, x }, checkpoint: 1 };
+  };
+
+  it('starts with a clear sky waiting for its waves', () => {
+    expect(newRun(SKY).skies).toEqual({ ufos: [], bombs: [], holes: [], nextWave: 0 });
+  });
+
+  it('launches a UFO when the buggy reaches its wave', () => {
+    const s = stepRun(SKY, placed(119.95), IDLE);
+    expect(s.events).toEqual([{ kind: 'ufo-in' }]);
+    expect(s.run.skies.ufos).toHaveLength(1);
+  });
+
+  it('is wrecked by a bomb landing on it', () => {
+    const run = {
+      ...placed(150),
+      skies: { ...newRun(SKY).skies, bombs: [{ x: 150, y: 0.01, vy: -5 }], nextWave: 1 },
+    };
+    const s = stepRun(SKY, run, IDLE);
+    expect(s.events).toEqual([{ kind: 'impact', x: 150 }, { kind: 'crash' }]);
+  });
+
+  it('drops into a crater a bomb has blown', () => {
+    const run = {
+      ...placed(150),
+      skies: { ...newRun(SKY).skies, holes: [{ x: 149, width: 2.2 }], nextWave: 1 },
+    };
+    expect(stepRun(SKY, run, IDLE).events).toEqual([{ kind: 'crash' }]);
+    const flying = { ...run, buggy: { ...run.buggy, y: 1, vy: 1 } };
+    expect(stepRun(SKY, flying, IDLE).events).toEqual([]);
+  });
+
+  it('pays for a UFO brought down, with the bolt spent', () => {
+    const ufo = {
+      x: 158,
+      y: UFO.hoverY,
+      z: 0,
+      wave: 0,
+      phase: 'attack' as const,
+      t: 0,
+      from: { x: 158, y: UFO.hoverY, z: 0 },
+      bombs: 3,
+      reload: 5,
+      anchor: 158,
+    };
+    const bolt = { x: 158, y: UFO.hoverY, vx: 0, vy: 0, from: 158 };
+    const run = {
+      ...placed(150),
+      guns: { forward: null, up: [bolt] },
+      skies: { ...newRun(SKY).skies, ufos: [ufo], nextWave: 1 },
+    };
+    const s = stepRun(SKY, run, IDLE);
+    expect(s.events).toEqual([
+      { kind: 'ufo-down', x: expect.any(Number) as number, y: expect.any(Number) as number },
+      { kind: 'points', points: UFO.points },
+    ]);
+    expect(s.run.guns.up).toEqual([]);
+    expect(s.run.skies.ufos).toEqual([]);
+  });
+
+  it('respawns under a clear sky, the waves since the checkpoint waiting again', () => {
+    const run = {
+      ...placed(150),
+      checkpoint: 1,
+      phase: { kind: 'crashed' as const, left: STEP },
+      skies: {
+        ufos: [],
+        bombs: [{ x: 1, y: 1, vy: 0 }],
+        holes: [{ x: 140, width: 2 }],
+        nextWave: 1,
+      },
+    };
+    expect(stepRun(SKY, run, IDLE).run.skies).toEqual({
+      ufos: [],
+      bombs: [],
+      holes: [],
+      nextWave: 0,
+    });
   });
 });

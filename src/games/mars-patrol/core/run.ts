@@ -1,15 +1,17 @@
 /**
- * One run (ADR-0017): drive, jump, shoot, crash, respawn at the last
- * checkpoint, clear the section or run out of lives. A pure step at a fixed
+ * One run (ADR-0017): drive, jump, shoot, dodge the bombs, crash, respawn at
+ * the last checkpoint, clear the section or run out of lives. A pure step at a fixed
  * rate; what happened comes back as events for the sound and the screen.
  */
 import { airborne, drive, startBuggy } from './buggy';
 import type { Buggy } from './buggy';
-import { checkpointX, cratersBehind, finish, inCrater } from './course';
+import { checkpointX, cratersBehind, finish, inPit } from './course';
 import type { Course, RockSize } from './course';
 import { advance, fire, HOLSTERED } from './guns';
 import type { Bolt, Guns } from './guns';
 import { hitsBuggy, jumpedPoints, restore, standing, struck } from './rocks';
+import { clearSkies, stepSkies } from './skies';
+import type { Skies, SkyEvent } from './skies';
 import { checkpointBonus, clearBonus, pay } from './scoring';
 import type { Purse } from './scoring';
 import { DRIVE, POINTS, ROCKS, RULES, STEP } from './tuning';
@@ -28,6 +30,7 @@ export interface Run {
   /** Shots each rock has taken, by its index in the course. */
   damage: readonly number[];
   guns: Guns;
+  skies: Skies;
 }
 
 /** This step's controls: the lever, and the presses that went down. */
@@ -49,7 +52,8 @@ export type RunEvent =
   | { kind: 'extra-life' }
   | { kind: 'checkpoint'; letter: string; bonus: number }
   | { kind: 'clear'; bonus: number }
-  | { kind: 'over' };
+  | { kind: 'over' }
+  | SkyEvent;
 
 export interface Stepped {
   run: Run;
@@ -65,6 +69,7 @@ export function newRun(course: Course): Run {
     phase: { kind: 'driving' },
     damage: course.rocks.map(() => 0),
     guns: HOLSTERED,
+    skies: clearSkies(course.ufos, checkpointX(course, 0)),
   };
 }
 
@@ -112,7 +117,8 @@ function shoot(course: Course, s: Stepped, trigger: boolean): Stepped {
 
 function wrecked(course: Course, run: Run): boolean {
   const { buggy } = run;
-  return (!airborne(buggy) && inCrater(course, buggy.x)) || hitsBuggy(course, run.damage, buggy);
+  const pits = [...course.craters, ...run.skies.holes];
+  return (!airborne(buggy) && inPit(pits, buggy.x)) || hitsBuggy(course, run.damage, buggy);
 }
 
 function crash(s: Stepped): Stepped {
@@ -143,8 +149,15 @@ function clear(course: Course, s: Stepped): Stepped {
 }
 
 function driving(course: Course, run: Run, controls: Controls): Stepped {
-  const s = shoot(course, move(course, run, controls), controls.fire);
-  if (wrecked(course, s.run)) return crash(s);
+  const shot = shoot(course, move(course, run, controls), controls.fire);
+  const sky = stepSkies(course.ufos, shot.run.skies, shot.run.guns.up, shot.run.buggy);
+  const guns = { ...shot.run.guns, up: sky.up };
+  const flown = {
+    run: { ...shot.run, skies: sky.skies, guns },
+    events: [...shot.events, ...sky.events],
+  };
+  const s = award(flown, sky.points);
+  if (sky.bombed || wrecked(course, s.run)) return crash(s);
   return clear(course, passCheckpoint(course, s));
 }
 
@@ -156,6 +169,7 @@ function respawn(course: Course, run: Run): Stepped {
     phase: { kind: 'driving' },
     damage: restore(course, run.damage, checkpointX(course, run.checkpoint)),
     guns: HOLSTERED,
+    skies: clearSkies(course.ufos, checkpointX(course, run.checkpoint)),
   };
   return { run: next, events: [{ kind: 'respawn' }] };
 }

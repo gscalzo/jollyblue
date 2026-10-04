@@ -13,6 +13,7 @@ const COURSE: Course = {
   ],
   craters: [],
   rocks: [],
+  ufos: [],
 };
 const run = newRun(COURSE);
 const at = (x: number) => ({ ...run, buggy: { ...run.buggy, x } });

@@ -4,7 +4,12 @@ import type { Course } from './course';
 import { newRun } from './run';
 import { DRIVE } from './tuning';
 
-const COURSE: Course = { checkpoints: [{ letter: 'A', x: 0, par: 0 }], craters: [], rocks: [] };
+const COURSE: Course = {
+  checkpoints: [{ letter: 'A', x: 0, par: 0 }],
+  craters: [],
+  rocks: [],
+  ufos: [],
+};
 
 describe('the camera', () => {
   it('looks less far ahead as the buggy speeds up', () => {

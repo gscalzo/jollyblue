@@ -3,6 +3,7 @@
  * them, hand-authored and validated. Positions are metres along the road.
  */
 import { DRIVE, ROCKS, RULES } from './tuning';
+import type { Wave } from './ufo';
 
 interface Checkpoint {
   letter: string;
@@ -30,6 +31,8 @@ export interface Course {
   checkpoints: readonly Checkpoint[];
   craters: readonly Crater[];
   rocks: readonly Rock[];
+  /** UFO waves, in the order the buggy reaches them. */
+  ufos: readonly Wave[];
 }
 
 /** Clear road kept after every checkpoint, so a respawn never lands in trouble. */
@@ -80,6 +83,12 @@ export const SECTION: Course = {
     { x: 970, size: 'small' },
     { x: 1040, size: 'big' },
     { x: 1130, size: 'small' },
+  ],
+  ufos: [
+    { at: 915, hover: 9, bombs: 4, every: 1.8 },
+    { at: 1010, hover: 6, bombs: 4, every: 1.5 },
+    { at: 1060, hover: 12, bombs: 5, every: 1.3 },
+    { at: 1120, hover: 4, bombs: 3, every: 1.2 },
   ],
 };
 
@@ -136,6 +145,16 @@ function rockError(course: Course, rock: Rock, i: number): string | null {
   return crowds(course, from, to) ? `rock ${i} crowds a checkpoint` : null;
 }
 
+function waveError(course: Course, wave: Wave, i: number): string | null {
+  const numbers = [wave.at, wave.hover, wave.bombs, wave.every];
+  if (!numbers.every(Number.isFinite) || numbers.slice(1).some((n) => n <= 0)) {
+    return `wave ${i} is malformed`;
+  }
+  const before = course.ufos[i - 1];
+  if (before && wave.at < before.at) return `wave ${i} comes before wave ${i - 1}`;
+  return wave.at >= finish(course) ? `wave ${i} is past the finish` : null;
+}
+
 /** Every reason the course cannot be played; empty when it is sound. */
 export function validateCourse(course: Course): string[] {
   const errors = checkpointErrors(course);
@@ -143,13 +162,24 @@ export function validateCourse(course: Course): string[] {
   return [
     ...course.craters.flatMap((c, i) => craterError(course, c, i) ?? []),
     ...course.rocks.flatMap((r, i) => rockError(course, r, i) ?? []),
+    ...course.ufos.flatMap((w, i) => waveError(course, w, i) ?? []),
   ];
 }
 
-/** True when a buggy whose middle is at `x` would drop into a crater. */
-export function inCrater(course: Course, x: number): boolean {
+/** True when a buggy whose middle is at `x` would drop into one of `craters`. */
+export function inPit(craters: readonly Crater[], x: number): boolean {
   const m = RULES.craterMargin;
-  return course.craters.some((c) => x > c.x + m && x < c.x + c.width - m);
+  return craters.some((c) => x > c.x + m && x < c.x + c.width - m);
+}
+
+/** The craters in one list and not the other: what changed in the road. */
+export function changedCraters(a: readonly Crater[], b: readonly Crater[]): Crater[] {
+  return [...a.filter((c) => !b.includes(c)), ...b.filter((c) => !a.includes(c))];
+}
+
+/** True when a crater reaches into the stretch from `from` to `to`. */
+export function reaches(crater: Crater, from: number, to: number): boolean {
+  return crater.x + crater.width >= from && crater.x <= to;
 }
 
 /** How many craters lie wholly behind `x`. */

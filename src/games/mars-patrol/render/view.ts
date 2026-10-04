@@ -12,6 +12,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { MARS_LOOK } from '../../../palette';
 import { framing } from '../core/camera';
+import { effects } from '../core/effects';
 import type { Course } from '../core/course';
 import { finish } from '../core/course';
 import type { GameEvent, Screen } from '../core/flow';
@@ -22,6 +23,7 @@ import { createHudLayer } from './hud';
 import { buildBuggy, WHEEL_RADIUS } from './models';
 import type { BuggyModel } from './models';
 import { buildProps } from './props';
+import { buildUfos } from './ufos';
 import { buildWorld } from './world';
 import type { World } from './world';
 
@@ -66,12 +68,7 @@ function poseBuggy(model: BuggyModel, p: Pose, t: number): void {
 }
 
 function react(fx: Fx, events: readonly GameEvent[], p: Pose): void {
-  for (const e of events) {
-    if (e.kind === 'crash') fx.burst('crash', p.x, 0.5);
-    if (e.kind === 'land') fx.burst('dust', p.x, 0.1);
-    if (e.kind === 'hit') fx.burst('spark', e.x, 0.6);
-    if (e.kind === 'break') fx.burst('rubble', e.x, 0.5);
-  }
+  for (const e of effects(events, p.x)) fx.burst(e.burst, e.x, e.y);
 }
 
 export function buildStage(course: Course): Stage {
@@ -79,7 +76,8 @@ export function buildStage(course: Course): Stage {
   const buggy = buildBuggy();
   const fx = buildFx();
   const props = buildProps(course);
-  world.scene.add(buggy.root, fx.group, props.group);
+  const ufos = buildUfos();
+  world.scene.add(buggy.root, fx.group, props.group, ufos.group);
   const camera = new THREE.PerspectiveCamera(MARS_LOOK.fov, 16 / 9, 0.5, 3000);
   const shot = { focus: 0, yaw: 0.5, distance: 9 };
   return {
@@ -93,6 +91,8 @@ export function buildStage(course: Course): Stage {
       react(fx, events, p);
       fx.update(dt);
       props.update(screen, events, dt);
+      ufos.update(screen, t);
+      world.terrain.reshape(screen.kind === 'title' ? [] : screen.run.skies.holes);
       const want = framing(screen);
       const k = (rate: number) => 1 - Math.exp(-rate * dt);
       shot.focus += (want.focus - shot.focus) * k(FOLLOW.focus);

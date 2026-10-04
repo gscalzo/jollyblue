@@ -144,3 +144,57 @@ export function buildRock(size: number, seed: number): THREE.Mesh {
   rock.position.y = size * 0.45;
   return rock;
 }
+
+export interface UfoModel {
+  root: THREE.Group;
+  /** Spins under the dome. */
+  rim: THREE.Group;
+}
+
+/** A saucer: polished hull, glowing dome and a ring of lights. */
+export function buildUfo(): UfoModel {
+  const root = new THREE.Group();
+  const hull = physical(MARS.ufoHull, { metalness: 0.9, roughness: 0.18, clearcoat: 1 });
+  const saucer = mesh(new THREE.SphereGeometry(1.6, 32, 12), hull);
+  saucer.scale.set(1, 0.28, 1);
+  const dome = mesh(
+    new THREE.SphereGeometry(0.7, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2),
+    physical(MARS.ufoDome, {
+      emissive: MARS.ufoDome,
+      emissiveIntensity: 1.2,
+      roughness: 0.05,
+      clearcoat: 1,
+    }),
+  );
+  dome.position.y = 0.25;
+  const belly = mesh(new THREE.CylinderGeometry(0.5, 0.7, 0.2, 20), glow(MARS.ufoGlow, 3));
+  belly.position.y = -0.38;
+  const rim = new THREE.Group();
+  const lamp = glow(MARS.ufoGlow, 5);
+  for (let i = 0; i < 10; i++) {
+    const a = (i / 10) * Math.PI * 2;
+    rim.add(
+      place(
+        mesh(new THREE.SphereGeometry(0.09, 8, 6), lamp),
+        Math.cos(a) * 1.5,
+        0,
+        Math.sin(a) * 1.5,
+      ),
+    );
+  }
+  root.add(saucer, dome, belly, rim);
+  return { root, rim };
+}
+
+/** A bomb: a dark shell with a red-hot core. */
+export function buildBomb(): THREE.Group {
+  const root = new THREE.Group();
+  const shell = mesh(
+    new THREE.SphereGeometry(0.28, 16, 12),
+    physical(MARS.bomb, { metalness: 0.6, roughness: 0.4 }),
+  );
+  const core = mesh(new THREE.SphereGeometry(0.12, 10, 8), glow(MARS.bombGlow, 6));
+  core.position.y = -0.2;
+  root.add(shell, core);
+  return root;
+}

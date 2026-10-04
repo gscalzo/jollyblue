@@ -4,6 +4,7 @@
  */
 import * as THREE from 'three';
 import { MARS } from '../../../palette';
+import type { Burst } from '../core/effects';
 
 const MAX = 600;
 const GRAVITY = 9;
@@ -16,8 +17,6 @@ interface Particle {
   size: number;
   colour: THREE.Color;
 }
-
-type Burst = 'crash' | 'dust' | 'spark' | 'rubble';
 
 export interface Fx {
   group: THREE.Group;
@@ -68,7 +67,13 @@ export function buildFx(): Fx {
   shards.frustumCulled = false;
   const fireball = new THREE.Mesh(
     new THREE.SphereGeometry(1, 20, 14),
-    new THREE.MeshBasicMaterial({ color: MARS.fire, transparent: true, opacity: 0 }),
+    new THREE.MeshBasicMaterial({
+      color: MARS.fire,
+      transparent: true,
+      opacity: 0,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
   );
   group.add(shards, fireball);
   let particles: Particle[] = [];

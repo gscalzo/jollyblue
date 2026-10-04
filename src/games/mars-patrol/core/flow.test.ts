@@ -13,6 +13,7 @@ const COURSE: Course = {
   ],
   craters: [],
   rocks: [],
+  ufos: [],
 };
 const IDLE: Controls = { lever: 0, jump: false, fire: false };
 const FIRE: Controls = { ...IDLE, fire: true };
