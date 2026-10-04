@@ -36,3 +36,48 @@ body {
   height: 100%;
   image-rendering: pixelated;
 }
+
+.veil,
+.game {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.veil {
+  background: var(--veil);
+  opacity: 0;
+}
+
+.game {
+  display: none;
+  background: var(--veil);
+  image-rendering: pixelated;
+  object-fit: contain;
+}
+
+.game.on {
+  display: block;
+}
+
+.prompt {
+  position: absolute;
+  left: 50%;
+  bottom: 6vh;
+  transform: translateX(-50%);
+  padding: 0.5em 1em;
+  background: var(--veil);
+  color: var(--glow);
+  border: 2px solid var(--neon);
+  box-shadow: var(--shadow-neon);
+  letter-spacing: 0.15em;
+  white-space: nowrap;
+  opacity: 0;
+  transition: var(--motion-fade);
+}
+
+.prompt.on {
+  opacity: 1;
+}
