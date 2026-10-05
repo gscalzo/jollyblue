@@ -25,7 +25,8 @@ function course(craters: Crater[], checkpoints = [START, END], rocks: Rock[] = [
 }
 
 describe('the section', () => {
-  it('is sound, runs A to E and has craters in every stretch', () => {
+  it('is sound, runs A to E in 100 m stretches, with craters in every one', () => {
+    expect(SECTION.checkpoints.map((c) => c.x)).toEqual([0, 100, 200, 300, 400]);
     expect(validateCourse(SECTION)).toEqual([]);
     expect(SECTION.checkpoints.map((c) => c.letter).join('')).toBe('ABCDE');
     for (let i = 1; i < SECTION.checkpoints.length; i++) {
@@ -153,13 +154,14 @@ describe('rocks in the course', () => {
     ]);
   });
 
-  it('puts small rocks in B, big ones in C, and both later', () => {
-    const between = (from: number, to: number) =>
-      SECTION.rocks.filter((r) => r.x > from && r.x < to);
-    expect(between(0, 300)).toEqual([]);
-    expect(between(300, 600).every((r) => r.size === 'small')).toBe(true);
-    expect(between(600, 900).some((r) => r.size === 'big')).toBe(true);
-    expect(between(900, 1200).length).toBeGreaterThan(0);
+  it('mixes craters and rocks in every stretch, big rocks from B', () => {
+    for (let i = 1; i < SECTION.checkpoints.length; i++) {
+      const from = checkpointX(SECTION, i - 1);
+      const to = checkpointX(SECTION, i);
+      expect(SECTION.rocks.some((r) => r.x > from && r.x < to)).toBe(true);
+    }
+    expect(SECTION.rocks.filter((r) => r.x < 100).every((r) => r.size === 'small')).toBe(true);
+    expect(SECTION.rocks.some((r) => r.size === 'big')).toBe(true);
   });
 });
 
@@ -198,9 +200,10 @@ describe('UFO waves in the course', () => {
     ]);
   });
 
-  it('sends the UFOs in the last stretch only', () => {
-    expect(SECTION.ufos.length).toBeGreaterThan(1);
-    expect(SECTION.ufos.every((w) => w.at > 900)).toBe(true);
+  it('sends a UFO from the start, and two at once later', () => {
+    expect(SECTION.ufos[0]?.at).toBeLessThanOrEqual(10);
+    const pairs = SECTION.ufos.filter((w, i) => (SECTION.ufos[i + 1]?.at ?? Infinity) - w.at < 10);
+    expect(pairs.length).toBeGreaterThan(0);
   });
 });
 

@@ -45,50 +45,49 @@ export const CRATER_DEPTH = 1.1;
 /** Clear road an obstacle keeps from the next, so a jump can land. */
 export const LANDING_ROOM = DRIVE.half * 4;
 
-/** Section A–E. Each stretch teaches one thing and tightens the rhythm. */
+/**
+ * Stage 1, A–E (ADR-0022): four 100 m stretches, an obstacle every 16–25 m
+ * and pairs from the start — craters back to back, a crater then a rock to
+ * shoot — with a UFO overhead almost all the way, two at once in C.
+ */
 export const SECTION: Course = {
   checkpoints: [
     { letter: 'A', x: 0, par: 0 },
-    { letter: 'B', x: 300, par: 35 },
-    { letter: 'C', x: 600, par: 34 },
-    { letter: 'D', x: 900, par: 33 },
-    { letter: 'E', x: 1200, par: 32 },
+    { letter: 'B', x: 100, par: 12 },
+    { letter: 'C', x: 200, par: 12 },
+    { letter: 'D', x: 300, par: 12 },
+    { letter: 'E', x: 400, par: 11 },
   ],
   craters: [
-    { x: 60, width: 2 },
-    { x: 115, width: 2.5 },
-    { x: 170, width: 2.5 },
-    { x: 225, width: 3 },
-    { x: 330, width: 3 },
-    { x: 430, width: 2.5 },
-    { x: 555, width: 3 },
-    { x: 630, width: 3 },
-    { x: 645, width: 3 },
-    { x: 750, width: 3.5 },
-    { x: 764, width: 3 },
-    { x: 860, width: 4 },
-    { x: 930, width: 3.5 },
-    { x: 1000, width: 3 },
-    { x: 1080, width: 4 },
-    { x: 1094, width: 3 },
-    { x: 1160, width: 3.5 },
+    { x: 25, width: 2.5 },
+    { x: 62, width: 3 },
+    { x: 71, width: 2.5 },
+    { x: 122, width: 3 },
+    { x: 182, width: 3 },
+    { x: 222, width: 3 },
+    { x: 231, width: 3 },
+    { x: 270, width: 4 },
+    { x: 335, width: 3.5 },
+    { x: 368, width: 3 },
+    { x: 377, width: 3 },
   ],
   rocks: [
-    { x: 380, size: 'small' },
-    { x: 470, size: 'small' },
-    { x: 510, size: 'small' },
-    { x: 700, size: 'big' },
-    { x: 810, size: 'big' },
-    { x: 830, size: 'small' },
-    { x: 970, size: 'small' },
-    { x: 1040, size: 'big' },
-    { x: 1130, size: 'small' },
+    { x: 45, size: 'small' },
+    { x: 92, size: 'small' },
+    { x: 136, size: 'small' },
+    { x: 165, size: 'big' },
+    { x: 252, size: 'big' },
+    { x: 288, size: 'small' },
+    { x: 322, size: 'small' },
+    { x: 352, size: 'big' },
+    { x: 393, size: 'small' },
   ],
   ufos: [
-    { at: 915, hover: 9, bombs: 4, every: 1.8 },
-    { at: 1010, hover: 6, bombs: 4, every: 1.5 },
-    { at: 1060, hover: 12, bombs: 5, every: 1.3 },
-    { at: 1120, hover: 4, bombs: 3, every: 1.2 },
+    { at: 5, hover: 10, bombs: 3, every: 2 },
+    { at: 130, hover: 7, bombs: 3, every: 1.8 },
+    { at: 205, hover: 10, bombs: 3, every: 1.6 },
+    { at: 210, hover: 5, bombs: 3, every: 1.7 },
+    { at: 310, hover: 9, bombs: 4, every: 1.5 },
   ],
 };
 

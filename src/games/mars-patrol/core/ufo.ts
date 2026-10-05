@@ -132,9 +132,11 @@ export function blasts(x: number, buggy: Buggy): boolean {
   return Math.abs(x - buggy.x) < DRIVE.half + BOMB.blast && buggy.y < BOMB.reach;
 }
 
-/** The crater a bomb landing at `x` leaves, if it lands ahead of the buggy. */
+/** The crater a bomb landing at `x` leaves, if it lands far enough ahead to be jumped. */
 export function hole(x: number, buggy: Buggy): Crater | null {
-  return x > buggy.x + DRIVE.half + BOMB.blast ? { x: x - BOMB.hole / 2, width: BOMB.hole } : null;
+  return x - BOMB.hole / 2 >= buggy.x + BOMB.clearance
+    ? { x: x - BOMB.hole / 2, width: BOMB.hole }
+    : null;
 }
 
 /** True when an upward bolt passes close enough to a UFO in the road's plane. */

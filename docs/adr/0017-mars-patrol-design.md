@@ -1,6 +1,6 @@
 # 0017 — Mars Patrol 3D's design: side-on, one lane, depth that warns
 
-**Status:** accepted
+**Status:** accepted; the scope and the stretch-by-stretch plan are superseded-by-0022
 **Date:** 2026-10-04
 
 ## Context

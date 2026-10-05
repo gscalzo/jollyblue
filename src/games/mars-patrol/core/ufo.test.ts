@@ -143,15 +143,12 @@ describe('bombs', () => {
     expect(blasts(0, { ...buggy, y: BOMB.reach })).toBe(false);
   });
 
-  it('leave a crater only ahead of the buggy', () => {
-    const buggy = startBuggy(50);
-    const ahead = 50 + DRIVE.half + BOMB.blast;
-    expect(hole(ahead + 0.01, buggy)).toEqual({
-      x: ahead + 0.01 - BOMB.hole / 2,
-      width: BOMB.hole,
-    });
-    expect(hole(ahead, buggy)).toBeNull();
-    expect(hole(40, buggy)).toBeNull();
+  it('leave a crater only far enough ahead to be jumped', () => {
+    const buggy = startBuggy(0);
+    const edge = BOMB.clearance + BOMB.hole / 2;
+    expect(hole(edge, buggy)).toEqual({ x: BOMB.clearance, width: BOMB.hole });
+    expect(hole(edge - 0.01, buggy)).toBeNull();
+    expect(hole(-10, buggy)).toBeNull();
   });
 });
 

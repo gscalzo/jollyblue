@@ -49,6 +49,15 @@ arcade game, set on Mars. Each slice is again its own merge to `main`:
    craters, D and E tuned.
 5. **Music** — the game's own Lyria track.
 
+Then A to Z (ADR-0022), a stage per slice:
+
+6. **Stage 1, dense** — 100 m stretches, an obstacle every 16–25 m, UFOs
+   from A, bomb craters only where they can be jumped.
+7. **E–J** — mines.
+8. **J–O** — tanks that shoot back.
+9. **O–T** — rolling boulders.
+10. **T–Z** — the crater bomber, and the fastest mix.
+
 The decisions are in [`docs/adr/`](docs/adr/README.md).
 
 ## Getting started

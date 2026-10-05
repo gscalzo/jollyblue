@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { startBuggy } from './buggy';
 import { clearSkies, stepSkies } from './skies';
 import type { Skies } from './skies';
-import { BOMB, DRIVE, STEP, UFO } from './tuning';
+import { BOMB, STEP, UFO } from './tuning';
 import { launch } from './ufo';
 import type { Ufo, Wave } from './ufo';
 
@@ -97,7 +97,7 @@ describe('stepSkies', () => {
   it('lands bombs: one on the buggy wrecks it, one ahead leaves a crater, one behind leaves nothing', () => {
     const bombs = [
       { x: 50, y: 0.01, vy: -5 },
-      { x: 60, y: 0.01, vy: -5 },
+      { x: 62, y: 0.01, vy: -5 },
       { x: 40, y: 0.01, vy: -5 },
       { x: 70, y: 5, vy: 0 },
     ];
@@ -105,10 +105,10 @@ describe('stepSkies', () => {
     expect(s.bombed).toBe(true);
     expect(s.events).toEqual([
       { kind: 'impact', x: 50 },
-      { kind: 'impact', x: 60 },
+      { kind: 'impact', x: 62 },
       { kind: 'impact', x: 40 },
     ]);
-    expect(s.skies.holes).toEqual([{ x: 60 - BOMB.hole / 2, width: BOMB.hole }]);
+    expect(s.skies.holes).toEqual([{ x: 62 - BOMB.hole / 2, width: BOMB.hole }]);
     expect(s.skies.bombs).toHaveLength(1);
   });
 
@@ -120,7 +120,7 @@ describe('stepSkies', () => {
   });
 
   it('lets a bomb landing clear of the buggy spare it', () => {
-    const bombs = [{ x: 50 + DRIVE.half + BOMB.blast + 1, y: 0, vy: 0 }];
+    const bombs = [{ x: 50 + BOMB.clearance + BOMB.hole, y: 0, vy: 0 }];
     const s = stepSkies(WAVES, { ...empty, bombs, nextWave: 3 }, [], startBuggy(50));
     expect(s.bombed).toBe(false);
     expect(s.skies.holes).toHaveLength(1);

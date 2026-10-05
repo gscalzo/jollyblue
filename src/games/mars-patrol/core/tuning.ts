@@ -97,5 +97,7 @@ export const BOMB = {
   reach: 1,
   /** The crater a missed bomb leaves in the road ahead. */
   hole: 2.2,
+  /** A bomb only leaves a crater this far ahead of the buggy or more: closer, there is no time to jump. */
+  clearance: 7,
   points: 50,
 } as const;
